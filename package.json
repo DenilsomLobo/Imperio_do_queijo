@@ -1,0 +1,23 @@
+{
+  "name": "imperio-do-queijo",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node scripts/start-game.mjs",
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build",
+    "test": "vitest run",
+    "test:browser": "node scripts/qa-browser.mjs",
+    "test:management": "node scripts/qa-management.mjs"
+  },
+  "dependencies": {
+    "phaser": "3.90.0"
+  },
+  "devDependencies": {
+    "fake-indexeddb": "^6.2.5",
+    "playwright-core": "^1.64.0",
+    "vite": "^7.0.0",
+    "vitest": "^5.0.4"
+  }
+}

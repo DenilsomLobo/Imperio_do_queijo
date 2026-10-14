@@ -1,0 +1,212 @@
+:root {
+  --page: #fff8e7;
+  --section: #f3e7cf;
+  --wood: #5c4030;
+  --text: #352719;
+  --muted: #786858;
+  --primary: #52734d;
+  --primary-hover: #3d5a38;
+  --cheese: #f2c14e;
+  --back: #dcc9a7;
+  --border: #d8c5a5;
+  --link: #617b43;
+  --gold: #d99a24;
+  --rare: #c66b43;
+  --footer: #38291f;
+  color: var(--text);
+  background: var(--page);
+}
+body,
+#app {
+  background: var(--page);
+  color: var(--text);
+}
+header {
+  background: var(--wood);
+  border-color: var(--border);
+  color: var(--page);
+}
+header strong {
+  color: var(--cheese);
+}
+header span,
+.brand > span {
+  color: var(--page);
+}
+#hud {
+  color: var(--page);
+}
+#management-bar {
+  background: var(--section);
+  border-color: var(--border);
+}
+.metric {
+  background: var(--page);
+  border-color: var(--border);
+  box-shadow: 0 2px 5px #35271908;
+}
+.metric:hover {
+  background: var(--section);
+  border-color: var(--gold);
+}
+.metric span {
+  color: var(--muted);
+}
+.metric strong {
+  color: var(--text);
+}
+nav,
+aside {
+  background: var(--section);
+  border-color: var(--border);
+}
+.nav-title,
+.panel-eyebrow {
+  color: var(--muted);
+}
+h2 {
+  color: var(--text);
+}
+p,
+aside p,
+dialog p {
+  color: var(--muted);
+}
+b,
+strong {
+  color: inherit;
+}
+#intro {
+  color: var(--muted);
+  border-color: var(--border);
+}
+label {
+  color: var(--text);
+}
+.speed {
+  color: var(--page);
+}
+button {
+  background: var(--primary);
+  color: var(--page);
+  border-color: var(--primary);
+  box-shadow: 0 1px 2px #35271915;
+}
+button:hover {
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
+}
+.actions button:hover {
+  border-color: var(--primary-hover);
+}
+#catalogue {
+  background: var(--cheese);
+  color: var(--text);
+  border-color: var(--cheese);
+}
+#catalogue:hover {
+  background: var(--gold);
+}
+[data-close],
+#overview {
+  background: var(--back);
+  color: var(--text);
+  border-color: var(--border);
+}
+[data-close]:hover,
+#overview:hover {
+  background: var(--border);
+}
+input:not([type="checkbox"]),
+select,
+textarea {
+  background: var(--page);
+  color: var(--text);
+  border-color: var(--border);
+}
+.speed select {
+  background: var(--page);
+  color: var(--text);
+}
+#status {
+  color: var(--rare);
+}
+#map {
+  background: var(--page);
+}
+a {
+  color: var(--link);
+}
+footer {
+  background: var(--footer);
+  color: var(--page);
+}
+dialog {
+  background: var(--page);
+  color: var(--text);
+  border-color: var(--border);
+}
+dialog::backdrop {
+  background: #35271980;
+}
+.dialog-heading {
+  border-color: var(--border);
+}
+.dialog-heading small {
+  color: var(--muted);
+}
+.management-row {
+  background: var(--section);
+  border-color: var(--border);
+  color: var(--text);
+}
+.management-row:hover {
+  background: var(--back);
+  border-color: var(--gold);
+}
+.management-row strong,
+.row-arrow {
+  color: var(--link);
+}
+.summary-pills span {
+  background: var(--section);
+  color: var(--text);
+}
+.finance-total {
+  color: var(--gold);
+}
+.enemy-card h3 {
+  color: var(--rare);
+}
+.catalogue-grid article {
+  background: var(--section);
+  border-color: var(--border);
+}
+.catalogue-grid span {
+  color: var(--text);
+}
+.special-cows span {
+  color: var(--rare);
+}
+.zone-shortcuts {
+  order: 2;
+  display: grid;
+  gap: 6px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+.zone-shortcuts button {
+  background: var(--back);
+  color: var(--text);
+  border-color: var(--border);
+  font-size: 11px;
+}
+.zone-shortcuts button:hover {
+  background: var(--cheese);
+}
+nav > .zone-active {
+  background: var(--wood);
+  border-color: var(--wood);
+  color: var(--page);
+}

@@ -1,0 +1,32 @@
+[
+  {
+    "id": "rural",
+    "name": "Zona rural",
+    "background": "rural-open-v1.png",
+    "mappingStatus": "registered"
+  },
+  {
+    "id": "industrial",
+    "name": "Distrito industrial",
+    "background": "countryside-v7.png",
+    "mappingStatus": "pending"
+  },
+  {
+    "id": "urban",
+    "name": "Região urbana",
+    "background": "countryside-v8.png",
+    "mappingStatus": "pending"
+  },
+  {
+    "id": "outskirts",
+    "name": "Periferia",
+    "background": "countryside-v9.png",
+    "mappingStatus": "pending"
+  },
+  {
+    "id": "future",
+    "name": "Zona comercial futurista",
+    "background": "countryside-v10.png",
+    "mappingStatus": "pending"
+  }
+]

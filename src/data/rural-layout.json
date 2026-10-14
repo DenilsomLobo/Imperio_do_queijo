@@ -1,0 +1,1146 @@
+{
+  "background": "rural-village-v2.png",
+  "properties": [
+    {
+      "id": "farm-ze",
+      "name": "Fazenda do Seu Zé",
+      "type": "farm",
+      "owner": "player",
+      "x": 450,
+      "y": 1630,
+      "asset": "fazenda_inicial_seu-ze.png",
+      "width": 260,
+      "district": "countryside"
+    },
+    {
+      "id": "factory-ze",
+      "name": "Queijaria rudimentar",
+      "type": "factory",
+      "owner": "player",
+      "x": 820,
+      "y": 1550,
+      "asset": "fabrica_de_queijo_inicial.png",
+      "width": 230,
+      "district": "countryside"
+    },
+    {
+      "id": "sale-ze",
+      "name": "Barraquinha do Seu Zé",
+      "type": "sale",
+      "owner": "player",
+      "x": 775,
+      "y": 1740,
+      "control": [
+        880,
+        1810
+      ],
+      "asset": "ponto_de_venda_inicial_seu_ze.png",
+      "width": 200,
+      "intersectionId": "corner-sale-ze",
+      "district": "countryside"
+    },
+    {
+      "id": "sale-n1",
+      "name": "Ponto do moinho",
+      "type": "sale",
+      "owner": "neutral",
+      "x": 1265,
+      "y": 950,
+      "control": [
+        1370,
+        1020
+      ],
+      "width": 200,
+      "intersectionId": "corner-sale-n1",
+      "district": "town"
+    },
+    {
+      "id": "sale-n2",
+      "name": "Ponto dos campos",
+      "type": "sale",
+      "owner": "neutral",
+      "x": 1958,
+      "y": 930,
+      "control": [
+        2063,
+        1000
+      ],
+      "width": 200,
+      "intersectionId": "corner-sale-n2",
+      "district": "town"
+    },
+    {
+      "id": "sale-n3",
+      "name": "Ponto da colina",
+      "type": "sale",
+      "owner": "neutral",
+      "x": 995,
+      "y": 880,
+      "control": [
+        1100,
+        950
+      ],
+      "width": 200,
+      "intersectionId": "corner-sale-n3",
+      "district": "countryside"
+    },
+    {
+      "id": "sale-n4",
+      "name": "Ponto da cachoeira",
+      "type": "sale",
+      "owner": "neutral",
+      "x": 595,
+      "y": 1280,
+      "control": [
+        700,
+        1350
+      ],
+      "width": 200,
+      "intersectionId": "corner-sale-n4",
+      "district": "countryside"
+    },
+    {
+      "id": "sale-n5",
+      "name": "Ponto da feira",
+      "type": "sale",
+      "owner": "neutral",
+      "x": 1065,
+      "y": 1330,
+      "control": [
+        1170,
+        1400
+      ],
+      "width": 200,
+      "intersectionId": "corner-sale-n5",
+      "district": "countryside"
+    },
+    {
+      "id": "sale-n6",
+      "name": "Ponto central",
+      "type": "sale",
+      "owner": "neutral",
+      "x": 1520,
+      "y": 1152,
+      "control": [
+        1625,
+        1222
+      ],
+      "width": 200,
+      "intersectionId": "corner-sale-n6",
+      "district": "town"
+    },
+    {
+      "id": "sale-n7",
+      "name": "Ponto do bosque",
+      "type": "sale",
+      "owner": "neutral",
+      "x": 1345,
+      "y": 1650,
+      "control": [
+        1450,
+        1720
+      ],
+      "width": 200,
+      "intersectionId": "corner-sale-n7",
+      "district": "countryside"
+    },
+    {
+      "id": "sale-n8",
+      "name": "Ponto do leste",
+      "type": "sale",
+      "owner": "neutral",
+      "x": 2520,
+      "y": 652,
+      "control": [
+        2625,
+        722
+      ],
+      "width": 200,
+      "intersectionId": "corner-sale-n8",
+      "district": "north"
+    },
+    {
+      "id": "sale-e1",
+      "name": "Posto norte I",
+      "type": "sale",
+      "owner": "coalho",
+      "x": 1520,
+      "y": 597,
+      "control": [
+        1625,
+        667
+      ],
+      "width": 200,
+      "intersectionId": "corner-sale-e1",
+      "district": "north"
+    },
+    {
+      "id": "sale-e2",
+      "name": "Posto norte II",
+      "type": "sale",
+      "owner": "coalho",
+      "x": 1020,
+      "y": 541,
+      "control": [
+        1125,
+        611
+      ],
+      "width": 200,
+      "intersectionId": "corner-sale-e2",
+      "district": "north"
+    },
+    {
+      "id": "sale-e3",
+      "name": "Posto norte III",
+      "type": "sale",
+      "owner": "coalho",
+      "x": 2083,
+      "y": 597,
+      "control": [
+        2188,
+        667
+      ],
+      "width": 200,
+      "intersectionId": "corner-sale-e3",
+      "district": "north"
+    },
+    {
+      "id": "sale-e4",
+      "name": "Posto norte IV",
+      "type": "sale",
+      "owner": "coalho",
+      "x": 2458,
+      "y": 1041,
+      "control": [
+        2563,
+        1111
+      ],
+      "width": 200,
+      "intersectionId": "corner-sale-e4",
+      "district": "town"
+    },
+    {
+      "id": "sale-e5",
+      "name": "Posto norte V",
+      "type": "sale",
+      "owner": "coalho",
+      "x": 2458,
+      "y": 1374,
+      "control": [
+        2563,
+        1444
+      ],
+      "width": 200,
+      "intersectionId": "corner-sale-e5",
+      "district": "town"
+    },
+    {
+      "id": "farm-coalho",
+      "name": "Fazenda da Família Coalho",
+      "type": "farm",
+      "owner": "coalho",
+      "x": 2063,
+      "y": 345,
+      "asset": "fazenda_inimigo_1.png",
+      "width": 260,
+      "district": "north"
+    },
+    {
+      "id": "factory-coalho",
+      "name": "Queijaria da Família Coalho",
+      "type": "factory",
+      "owner": "coalho",
+      "x": 1500,
+      "y": 345,
+      "asset": "fabrica_de_queijo_inimigo_nivel_1.png",
+      "width": 240,
+      "district": "north"
+    },
+    {
+      "id": "bank-rural",
+      "name": "Banco rural",
+      "type": "service",
+      "owner": "public",
+      "asset": "banco_nivel_1.png",
+      "x": 1500,
+      "y": 1420,
+      "width": 220,
+      "service": "bank",
+      "level": 1,
+      "district": "town"
+    },
+    {
+      "id": "bank-city",
+      "name": "Banco central",
+      "type": "service",
+      "owner": "public",
+      "asset": "banco_nivel_2.png",
+      "x": 1940,
+      "y": 1500,
+      "width": 220,
+      "service": "bank",
+      "level": 1,
+      "district": "town"
+    },
+    {
+      "id": "employee-agency",
+      "name": "Agência de funcionários",
+      "type": "service",
+      "owner": "public",
+      "asset": "agencia_funcionario_nivel_1.png",
+      "x": 1810,
+      "y": 1820,
+      "width": 220,
+      "service": "employees",
+      "level": 1,
+      "district": "town"
+    },
+    {
+      "id": "security-agency",
+      "name": "Agência de capangas",
+      "type": "service",
+      "owner": "public",
+      "asset": "agencia_capanga_nivel_1.png",
+      "x": 2310,
+      "y": 1720,
+      "width": 220,
+      "service": "security",
+      "level": 1,
+      "district": "town"
+    },
+    {
+      "id": "cow-shop",
+      "name": "Loja de vacas",
+      "type": "service",
+      "owner": "public",
+      "asset": "loja_de_vacas_nivel_1.png",
+      "x": 750,
+      "y": 780,
+      "width": 220,
+      "service": "cows",
+      "level": 1,
+      "district": "countryside"
+    },
+    {
+      "id": "transport",
+      "name": "Transportadora",
+      "type": "service",
+      "owner": "public",
+      "asset": "transportadora_nivel_1.png",
+      "x": 2190,
+      "y": 1330,
+      "width": 220,
+      "service": "logistics",
+      "level": 1,
+      "district": "town"
+    },
+    {
+      "id": "farm-level-1",
+      "name": "Fazenda do vale",
+      "type": "farm",
+      "owner": "neutral",
+      "asset": "fazenda_nivel_1.png",
+      "x": 450,
+      "y": 750,
+      "width": 260,
+      "service": null,
+      "level": 1,
+      "district": "countryside"
+    },
+    {
+      "id": "farm-level-2",
+      "name": "Fazenda dos campos",
+      "type": "farm",
+      "owner": "neutral",
+      "asset": "fazenda_nivel_2.png",
+      "x": 340,
+      "y": 1190,
+      "width": 270,
+      "service": null,
+      "level": 2,
+      "district": "countryside"
+    },
+    {
+      "id": "factory-level-1",
+      "name": "Queijaria artesanal",
+      "type": "factory",
+      "owner": "neutral",
+      "asset": "fabrica_de_queijo_nivel_1.png",
+      "x": 850,
+      "y": 1150,
+      "width": 220,
+      "service": null,
+      "level": 1,
+      "district": "countryside"
+    },
+    {
+      "id": "factory-level-2",
+      "name": "Queijaria moderna",
+      "type": "factory",
+      "owner": "neutral",
+      "asset": "fabrica_de_queijo_nivel_2.png",
+      "x": 1625,
+      "y": 890,
+      "width": 220,
+      "service": null,
+      "level": 2,
+      "district": "town"
+    }
+  ],
+  "land": [
+    [
+      950,
+      1750
+    ],
+    [
+      2780,
+      1580
+    ],
+    [
+      540,
+      1020
+    ],
+    [
+      2680,
+      1280
+    ],
+    [
+      730,
+      520
+    ],
+    [
+      2800,
+      850
+    ]
+  ],
+  "width": 3000,
+  "height": 2000,
+  "layoutVersion": 3,
+  "streetLayoutVersion": 3,
+  "roads": [
+    {
+      "id": "path-0",
+      "name": "Estrada de terra",
+      "from": "sale-e2",
+      "to": "sale-e1",
+      "width": 36,
+      "points": [
+        {
+          "x": 1125,
+          "y": 611
+        },
+        {
+          "x": 1625,
+          "y": 667
+        }
+      ]
+    },
+    {
+      "id": "path-1",
+      "name": "Estrada de terra",
+      "from": "sale-e1",
+      "to": "sale-e3",
+      "width": 36,
+      "points": [
+        {
+          "x": 1625,
+          "y": 667
+        },
+        {
+          "x": 2188,
+          "y": 667
+        }
+      ]
+    },
+    {
+      "id": "path-2",
+      "name": "Estrada de terra",
+      "from": "sale-e3",
+      "to": "sale-n8",
+      "width": 36,
+      "points": [
+        {
+          "x": 2188,
+          "y": 667
+        },
+        {
+          "x": 2625,
+          "y": 722
+        }
+      ]
+    },
+    {
+      "id": "path-3",
+      "name": "Estrada de terra",
+      "from": "sale-n8",
+      "to": "sale-e5",
+      "width": 36,
+      "points": [
+        {
+          "x": 2625,
+          "y": 722
+        },
+        {
+          "x": 2563,
+          "y": 1444
+        }
+      ]
+    },
+    {
+      "id": "path-4",
+      "name": "Estrada de terra",
+      "from": "sale-e1",
+      "to": "sale-n6",
+      "width": 36,
+      "points": [
+        {
+          "x": 1625,
+          "y": 667
+        },
+        {
+          "x": 1625,
+          "y": 1222
+        }
+      ]
+    },
+    {
+      "id": "path-5",
+      "name": "Estrada de terra",
+      "from": "sale-e2",
+      "to": "sale-n3",
+      "width": 36,
+      "points": [
+        {
+          "x": 1125,
+          "y": 611
+        },
+        {
+          "x": 1100,
+          "y": 950
+        }
+      ]
+    },
+    {
+      "id": "path-6",
+      "name": "Estrada de terra",
+      "from": "sale-n1",
+      "to": "sale-n2",
+      "width": 36,
+      "points": [
+        {
+          "x": 1370,
+          "y": 1020
+        },
+        {
+          "x": 2063,
+          "y": 1000
+        }
+      ]
+    },
+    {
+      "id": "path-7",
+      "name": "Estrada de terra",
+      "from": "sale-n2",
+      "to": "sale-e4",
+      "width": 36,
+      "points": [
+        {
+          "x": 2063,
+          "y": 1000
+        },
+        {
+          "x": 2563,
+          "y": 1111
+        }
+      ]
+    },
+    {
+      "id": "path-8",
+      "name": "Estrada de terra",
+      "from": "sale-e4",
+      "to": "sale-e5",
+      "width": 36,
+      "points": [
+        {
+          "x": 2563,
+          "y": 1111
+        },
+        {
+          "x": 2563,
+          "y": 1444
+        }
+      ]
+    },
+    {
+      "id": "path-9",
+      "name": "Estrada de terra",
+      "from": "sale-e5",
+      "to": "sale-n6",
+      "width": 36,
+      "points": [
+        {
+          "x": 2563,
+          "y": 1444
+        },
+        {
+          "x": 1625,
+          "y": 1222
+        }
+      ]
+    },
+    {
+      "id": "path-10",
+      "name": "Estrada de terra",
+      "from": "sale-n6",
+      "to": "sale-n1",
+      "width": 36,
+      "points": [
+        {
+          "x": 1625,
+          "y": 1222
+        },
+        {
+          "x": 1370,
+          "y": 1020
+        }
+      ]
+    },
+    {
+      "id": "path-11",
+      "name": "Estrada de terra",
+      "from": "sale-n1",
+      "to": "sale-n3",
+      "width": 36,
+      "points": [
+        {
+          "x": 1370,
+          "y": 1020
+        },
+        {
+          "x": 1100,
+          "y": 950
+        }
+      ]
+    },
+    {
+      "id": "path-12",
+      "name": "Estrada de terra",
+      "from": "sale-n3",
+      "to": "sale-n4",
+      "width": 36,
+      "points": [
+        {
+          "x": 1100,
+          "y": 950
+        },
+        {
+          "x": 700,
+          "y": 1350
+        }
+      ]
+    },
+    {
+      "id": "path-13",
+      "name": "Estrada de terra",
+      "from": "sale-n4",
+      "to": "sale-n5",
+      "width": 36,
+      "points": [
+        {
+          "x": 700,
+          "y": 1350
+        },
+        {
+          "x": 1170,
+          "y": 1400
+        }
+      ]
+    },
+    {
+      "id": "path-14",
+      "name": "Estrada de terra",
+      "from": "sale-n5",
+      "to": "sale-n6",
+      "width": 36,
+      "points": [
+        {
+          "x": 1170,
+          "y": 1400
+        },
+        {
+          "x": 1625,
+          "y": 1222
+        }
+      ]
+    },
+    {
+      "id": "path-15",
+      "name": "Estrada de terra",
+      "from": "sale-n5",
+      "to": "sale-n7",
+      "width": 36,
+      "points": [
+        {
+          "x": 1170,
+          "y": 1400
+        },
+        {
+          "x": 1450,
+          "y": 1720
+        }
+      ]
+    },
+    {
+      "id": "path-16",
+      "name": "Estrada de terra",
+      "from": "sale-n7",
+      "to": "bank-rural",
+      "width": 36,
+      "points": [
+        {
+          "x": 1450,
+          "y": 1720
+        },
+        {
+          "x": 1500,
+          "y": 1450
+        }
+      ]
+    },
+    {
+      "id": "path-17",
+      "name": "Estrada de terra",
+      "from": "sale-ze",
+      "to": "sale-n4",
+      "width": 36,
+      "points": [
+        {
+          "x": 880,
+          "y": 1810
+        },
+        {
+          "x": 700,
+          "y": 1350
+        }
+      ]
+    },
+    {
+      "id": "path-18",
+      "name": "Estrada de terra",
+      "from": "sale-ze",
+      "to": "sale-n5",
+      "width": 36,
+      "points": [
+        {
+          "x": 880,
+          "y": 1810
+        },
+        {
+          "x": 1170,
+          "y": 1400
+        }
+      ]
+    },
+    {
+      "id": "path-19",
+      "name": "Estrada de terra",
+      "from": "farm-level-1",
+      "to": "cow-shop",
+      "width": 36,
+      "points": [
+        {
+          "x": 450,
+          "y": 780
+        },
+        {
+          "x": 750,
+          "y": 810
+        }
+      ]
+    },
+    {
+      "id": "path-20",
+      "name": "Estrada de terra",
+      "from": "cow-shop",
+      "to": "sale-n3",
+      "width": 36,
+      "points": [
+        {
+          "x": 750,
+          "y": 810
+        },
+        {
+          "x": 1100,
+          "y": 950
+        }
+      ]
+    },
+    {
+      "id": "path-21",
+      "name": "Estrada de terra",
+      "from": "farm-level-2",
+      "to": "sale-n4",
+      "width": 36,
+      "points": [
+        {
+          "x": 340,
+          "y": 1220
+        },
+        {
+          "x": 700,
+          "y": 1350
+        }
+      ]
+    },
+    {
+      "id": "path-22",
+      "name": "Estrada de terra",
+      "from": "farm-ze",
+      "to": "sale-ze",
+      "width": 36,
+      "points": [
+        {
+          "x": 450,
+          "y": 1660
+        },
+        {
+          "x": 880,
+          "y": 1810
+        }
+      ]
+    },
+    {
+      "id": "path-23",
+      "name": "Estrada de terra",
+      "from": "factory-ze",
+      "to": "sale-ze",
+      "width": 36,
+      "points": [
+        {
+          "x": 820,
+          "y": 1580
+        },
+        {
+          "x": 880,
+          "y": 1810
+        }
+      ]
+    },
+    {
+      "id": "path-24",
+      "name": "Estrada de terra",
+      "from": "factory-level-1",
+      "to": "sale-n3",
+      "width": 36,
+      "points": [
+        {
+          "x": 850,
+          "y": 1180
+        },
+        {
+          "x": 1100,
+          "y": 950
+        }
+      ]
+    },
+    {
+      "id": "path-25",
+      "name": "Estrada de terra",
+      "from": "factory-level-2",
+      "to": "sale-n6",
+      "width": 36,
+      "points": [
+        {
+          "x": 1625,
+          "y": 920
+        },
+        {
+          "x": 1625,
+          "y": 1222
+        }
+      ]
+    },
+    {
+      "id": "path-26",
+      "name": "Estrada de terra",
+      "from": "factory-coalho",
+      "to": "sale-e1",
+      "width": 36,
+      "points": [
+        {
+          "x": 1500,
+          "y": 375
+        },
+        {
+          "x": 1625,
+          "y": 667
+        }
+      ]
+    },
+    {
+      "id": "path-27",
+      "name": "Estrada de terra",
+      "from": "farm-coalho",
+      "to": "sale-e3",
+      "width": 36,
+      "points": [
+        {
+          "x": 2063,
+          "y": 375
+        },
+        {
+          "x": 2188,
+          "y": 667
+        }
+      ]
+    },
+    {
+      "id": "path-28",
+      "name": "Estrada de terra",
+      "from": "bank-rural",
+      "to": "sale-n6",
+      "width": 36,
+      "points": [
+        {
+          "x": 1500,
+          "y": 1450
+        },
+        {
+          "x": 1625,
+          "y": 1222
+        }
+      ]
+    },
+    {
+      "id": "path-29",
+      "name": "Estrada de terra",
+      "from": "bank-city",
+      "to": "bank-rural",
+      "width": 36,
+      "points": [
+        {
+          "x": 1940,
+          "y": 1530
+        },
+        {
+          "x": 1500,
+          "y": 1450
+        }
+      ]
+    },
+    {
+      "id": "path-30",
+      "name": "Estrada de terra",
+      "from": "employee-agency",
+      "to": "bank-city",
+      "width": 36,
+      "points": [
+        {
+          "x": 1810,
+          "y": 1850
+        },
+        {
+          "x": 1940,
+          "y": 1530
+        }
+      ]
+    },
+    {
+      "id": "path-31",
+      "name": "Estrada de terra",
+      "from": "security-agency",
+      "to": "sale-e5",
+      "width": 36,
+      "points": [
+        {
+          "x": 2310,
+          "y": 1750
+        },
+        {
+          "x": 2563,
+          "y": 1444
+        }
+      ]
+    },
+    {
+      "id": "path-32",
+      "name": "Estrada de terra",
+      "from": "transport",
+      "to": "sale-e4",
+      "width": 36,
+      "points": [
+        {
+          "x": 2190,
+          "y": 1360
+        },
+        {
+          "x": 2563,
+          "y": 1111
+        }
+      ]
+    }
+  ],
+  "intersections": [
+    {
+      "id": "corner-sale-ze",
+      "x": 880,
+      "y": 1810,
+      "saleId": "sale-ze",
+      "roadIds": [
+        "path-17",
+        "path-18",
+        "path-22",
+        "path-23"
+      ]
+    },
+    {
+      "id": "corner-sale-n1",
+      "x": 1370,
+      "y": 1020,
+      "saleId": "sale-n1",
+      "roadIds": [
+        "path-6",
+        "path-10",
+        "path-11"
+      ]
+    },
+    {
+      "id": "corner-sale-n2",
+      "x": 2063,
+      "y": 1000,
+      "saleId": "sale-n2",
+      "roadIds": [
+        "path-6",
+        "path-7"
+      ]
+    },
+    {
+      "id": "corner-sale-n3",
+      "x": 1100,
+      "y": 950,
+      "saleId": "sale-n3",
+      "roadIds": [
+        "path-5",
+        "path-11",
+        "path-12",
+        "path-20",
+        "path-24"
+      ]
+    },
+    {
+      "id": "corner-sale-n4",
+      "x": 700,
+      "y": 1350,
+      "saleId": "sale-n4",
+      "roadIds": [
+        "path-12",
+        "path-13",
+        "path-17",
+        "path-21"
+      ]
+    },
+    {
+      "id": "corner-sale-n5",
+      "x": 1170,
+      "y": 1400,
+      "saleId": "sale-n5",
+      "roadIds": [
+        "path-13",
+        "path-14",
+        "path-15",
+        "path-18"
+      ]
+    },
+    {
+      "id": "corner-sale-n6",
+      "x": 1625,
+      "y": 1222,
+      "saleId": "sale-n6",
+      "roadIds": [
+        "path-4",
+        "path-9",
+        "path-10",
+        "path-14",
+        "path-25",
+        "path-28"
+      ]
+    },
+    {
+      "id": "corner-sale-n7",
+      "x": 1450,
+      "y": 1720,
+      "saleId": "sale-n7",
+      "roadIds": [
+        "path-15",
+        "path-16"
+      ]
+    },
+    {
+      "id": "corner-sale-n8",
+      "x": 2625,
+      "y": 722,
+      "saleId": "sale-n8",
+      "roadIds": [
+        "path-2",
+        "path-3"
+      ]
+    },
+    {
+      "id": "corner-sale-e1",
+      "x": 1625,
+      "y": 667,
+      "saleId": "sale-e1",
+      "roadIds": [
+        "path-0",
+        "path-1",
+        "path-4",
+        "path-26"
+      ]
+    },
+    {
+      "id": "corner-sale-e2",
+      "x": 1125,
+      "y": 611,
+      "saleId": "sale-e2",
+      "roadIds": [
+        "path-0",
+        "path-5"
+      ]
+    },
+    {
+      "id": "corner-sale-e3",
+      "x": 2188,
+      "y": 667,
+      "saleId": "sale-e3",
+      "roadIds": [
+        "path-1",
+        "path-2",
+        "path-27"
+      ]
+    },
+    {
+      "id": "corner-sale-e4",
+      "x": 2563,
+      "y": 1111,
+      "saleId": "sale-e4",
+      "roadIds": [
+        "path-7",
+        "path-8",
+        "path-32"
+      ]
+    },
+    {
+      "id": "corner-sale-e5",
+      "x": 2563,
+      "y": 1444,
+      "saleId": "sale-e5",
+      "roadIds": [
+        "path-3",
+        "path-8",
+        "path-9",
+        "path-31"
+      ]
+    }
+  ],
+  "roadTexture": "rural-dirt-road-v1.png"
+}

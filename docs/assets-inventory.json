@@ -1,0 +1,582 @@
+[
+  {
+    "id": 1,
+    "file": "agencia_capanga_nivel_1.png",
+    "width": 1254,
+    "height": 1254,
+    "bytes": 2555769,
+    "pixelFormat": "Format32bppArgb",
+    "sha256": "19E317A918FB5861195C577BDE9D1EB316975BB7FE65FEE09A329C650AD53C05",
+    "category": "securityAgency"
+  },
+  {
+    "id": 2,
+    "file": "agencia_funcionario_nivel_1.png",
+    "width": 1254,
+    "height": 1254,
+    "bytes": 2307734,
+    "pixelFormat": "Format32bppArgb",
+    "sha256": "D6BFF189F0EA22804D8087544F49BECBF259673730A276962A03C2678AE9EC8A",
+    "category": "employeeAgency"
+  },
+  {
+    "id": 3,
+    "file": "banco_nivel_1.png",
+    "width": 1254,
+    "height": 1254,
+    "bytes": 2087248,
+    "pixelFormat": "Format32bppArgb",
+    "sha256": "279C500C4797B1D3FCA0A0DDB956022ADEB7D288AD03CAB94B1EC132F3372640",
+    "category": "bank"
+  },
+  {
+    "id": 4,
+    "file": "banco_nivel_2.png",
+    "width": 1254,
+    "height": 1254,
+    "bytes": 2376780,
+    "pixelFormat": "Format32bppArgb",
+    "sha256": "5F76410A7E7822AF3E682D4DB38AE17CEF8A4C9D0043DE9D204E8EE0A49DFE26",
+    "category": "bank"
+  },
+  {
+    "id": 5,
+    "file": "bandeira_capanga_aliado.png",
+    "width": 511,
+    "height": 719,
+    "bytes": 536680,
+    "pixelFormat": "Format32bppArgb",
+    "sha256": "826E5F3561361C8A93DD8337ABCB07F3AB8998381EA5ECE52D7FB0CE28938C5F",
+    "category": "securityFlag"
+  },
+  {
+    "id": 6,
+    "file": "bandeira_capanga_inimiga.png",
+    "width": 519,
+    "height": 719,
+    "bytes": 574160,
+    "pixelFormat": "Format32bppArgb",
+    "sha256": "D670C2BBA54E40CDBEBCE21D532290714625E094783AC0EFFBC2F6C5B0850757",
+    "category": "securityFlag"
+  },
+  {
+    "id": 7,
+    "file": "bandeira_capanga_neutra.png",
+    "width": 511,
+    "height": 719,
+    "bytes": 533316,
+    "pixelFormat": "Format32bppArgb",
+    "sha256": "3995F75396EDD162918173B5647B851C5AF5D6A31EDCDF200F9D1236CF1A4F49",
+    "category": "securityFlag"
+  },
+  {
+    "id": 8,
+    "file": "Cálice de Leite Radioativo Neon.png",
+    "width": 1254,
+    "height": 1254,
+    "bytes": 1831866,
+    "pixelFormat": "Format32bppArgb",
+    "sha256": "92999D0E715B2D1927F04842B505DAB11419E016CFA6680577CB94DBACC5F33E",
+    "category": "milk"
+  },
+  {
+    "id": 9,
+    "file": "capangas_aliado_nivel_1.png",
+    "width": 588,
+    "height": 594,
+    "bytes": 552698,
+    "pixelFormat": "Format32bppArgb",
+    "sha256": "C6072A5607B80B01815B573065089FD5F09A05F22BA3B42663DA60F2C85B7E35",
+    "category": "securityTeam"
+  },
+  {
+    "id": 10,
+    "file": "capangas_aliado_nivel_2.png",
+    "width": 1254,
+    "height": 1254,
+    "bytes": 2461787,
+    "pixelFormat": "Format32bppArgb",
+    "sha256": "B5197D289A0896BB9005C354F7AE95D6AECB52A366C7F0F7B1BDD5C28DC98B43",
+    "category": "securityTeam"
+  },
+  {
+    "id": 11,
+    "file": "capangas_inimigos_nivel_1.png",
+    "width": 604,
+    "height": 569,
+    "bytes": 540397,
+    "pixelFormat": "Format32bppArgb",
+    "sha256": "5A0CB697E2E00D0BBF231DACA98FFC2D7C73D5E2A6FB089EF3266409E45D3BF0",
+    "category": "securityTeam"
+  },
+  {
+    "id": 12,
+    "file": "capangas_inimigos_nivel_2.png",
+    "width": 1254,
+    "height": 1254,
+    "bytes": 2424590,
+    "pixelFormat": "Format32bppArgb",
+    "sha256": "A23A8BA5DC7B40D408476DA683847D208E0A73F3534398F595627BE260E25833",
+    "category": "securityTeam"
+  },
+  {
+    "id": 13,
+    "file": "countryside-v10.png",
+    "width": 1536,
+    "height": 1024,
+    "bytes": 4396449,
+    "pixelFormat": "Format24bppRgb",
+    "sha256": "632B39B73956A4719656A1F5E0FCD66525E6BF2B305CB53369F6C2F3B52B32DC",
+    "category": "map"
+  },
+  {
+    "id": 14,
+    "file": "countryside-v6.png",
+    "width": 2176,
+    "height": 1024,
+    "bytes": 6496706,
+    "pixelFormat": "Format24bppRgb",
+    "sha256": "B709863AD7F38FBCED5F370B3AE5C6549DF08FE6688F476CFC3D1301E5EF1A78",
+    "category": "map"
+  },
+  {
+    "id": 15,
+    "file": "countryside-v7.png",
+    "width": 1536,
+    "height": 1024,
+    "bytes": 4294878,
+    "pixelFormat": "Format24bppRgb",
+    "sha256": "F3F371EB4D6C868243F82231793DCE42266A27874C4D65FB2FB67C3B4C067501",
+    "category": "map"
+  },
+  {
+    "id": 16,
+    "file": "countryside-v8.png",
+    "width": 1536,
+    "height": 1024,
+    "bytes": 4327649,
+    "pixelFormat": "Format24bppRgb",
+    "sha256": "9A32B39ED2E0D1C2D1F4BB5C0C8599AA1A8B25367761DF1069C0A1634AC03A78",
+    "category": "map"
+  },
+  {
+    "id": 17,
+    "file": "countryside-v9.png",
+    "width": 1536,
+    "height": 1024,
+    "bytes": 4327397,
+    "pixelFormat": "Format24bppRgb",
+    "sha256": "358D14F8BFD4855F041C5A149359614028856DA99CB5075963DE93B9C281C05D",
+    "category": "map"
+  },
+  {
+    "id": 18,
+    "file": "fabrica_de_queijo_inicial.png",
+    "width": 1254,
+    "height": 1254,
+    "bytes": 2960132,
+    "pixelFormat": "Format32bppArgb",
+    "sha256": "A3FCA248B4A11D470D0A0871009250FDE3F2B7A87BFF66556DBE6F35E1C68D7E",
+    "category": "factory"
+  },
+  {
+    "id": 19,
+    "file": "fabrica_de_queijo_inimigo_nivel_1.png",
+    "width": 1254,
+    "height": 1254,
+    "bytes": 3017205,
+    "pixelFormat": "Format32bppArgb",
+    "sha256": "C6026270EB75AF9A68B70A68FF787FEDFF3CE9D25FB04BB2C4477D42231DF3E8",
+    "category": "factory"
+  },
+  {
+    "id": 20,
+    "file": "fabrica_de_queijo_nivel_1.png",
+    "width": 1254,
+    "height": 1254,
+    "bytes": 2257787,
+    "pixelFormat": "Format32bppArgb",
+    "sha256": "8744069F74FF3092058F0E132526887E85D14D77EA29EE4167765B25DBC3A319",
+    "category": "factory"
+  },
+  {
+    "id": 21,
+    "file": "fabrica_de_queijo_nivel_2.png",
+    "width": 1254,
+    "height": 1254,
+    "bytes": 2345588,
+    "pixelFormat": "Format32bppArgb",
+    "sha256": "C3990FA0D5F994D38DA279325755C40B80EA1DBA108AF16EC708E13705246412",
+    "category": "factory"
+  },
+  {
+    "id": 22,
+    "file": "fazenda_inicial_seu-ze.png",
+    "width": 1254,
+    "height": 1254,
+    "bytes": 2564742,
+    "pixelFormat": "Format32bppArgb",
+    "sha256": "A5A37449ECBC49361EB6B9ADA222138E4C0A0A03F4DC09F963CC1F2BC5F7E4B5",
+    "category": "farm"
+  },
+  {
+    "id": 23,
+    "file": "fazenda_inimigo_1.png",
+    "width": 1254,
+    "height": 1254,
+    "bytes": 3151807,
+    "pixelFormat": "Format32bppArgb",
+    "sha256": "1B73DF2B19F48E0793128110B780106B3D90F494353A96AA70886128E4B8213B",
+    "category": "farm"
+  },
+  {
+    "id": 24,
+    "file": "fazenda_nivel_1.png",
+    "width": 1254,
+    "height": 1254,
+    "bytes": 2352652,
+    "pixelFormat": "Format32bppArgb",
+    "sha256": "407A2673272576F26A98BAF02169E78BC910AFBD90A34E4AEBE3D8D72075C51C",
+    "category": "farm"
+  },
+  {
+    "id": 25,
+    "file": "fazenda_nivel_2.png",
+    "width": 1254,
+    "height": 1254,
+    "bytes": 2854750,
+    "pixelFormat": "Format32bppArgb",
+    "sha256": "629D4D037495F11CD423AA1F466E1178DCA654A68FDCA87A3548666BA70B41D7",
+    "category": "farm"
+  },
+  {
+    "id": 26,
+    "file": "leite_comum.png",
+    "width": 1254,
+    "height": 1254,
+    "bytes": 1038021,
+    "pixelFormat": "Format32bppArgb",
+    "sha256": "0BB591A9BF796161AFFC7C418FC02CD3B02843ABD8C611F67F341D6FF8AC8379",
+    "category": "milk"
+  },
+  {
+    "id": 27,
+    "file": "leite_fraco.png",
+    "width": 1254,
+    "height": 1254,
+    "bytes": 1394646,
+    "pixelFormat": "Format32bppArgb",
+    "sha256": "E8E9702D3BA51E3AF598F901D751A2F3B6D69B937D8C6D973CD4485BF1096129",
+    "category": "milk"
+  },
+  {
+    "id": 28,
+    "file": "leite_magico.png",
+    "width": 1254,
+    "height": 1254,
+    "bytes": 1671822,
+    "pixelFormat": "Format32bppArgb",
+    "sha256": "9BE7D695CE9A52E4DFF1992E6BA8179DA7987C2635AC4BC42B45C512CBAFBA2B",
+    "category": "milk"
+  },
+  {
+    "id": 29,
+    "file": "leite_nobre.png",
+    "width": 1254,
+    "height": 1254,
+    "bytes": 1275198,
+    "pixelFormat": "Format32bppArgb",
+    "sha256": "7C5F39C21CAEC12943DE47BBC7E092C60E3B29D32C8014FFBB832608DBB10A28",
+    "category": "milk"
+  },
+  {
+    "id": 30,
+    "file": "loja_de_vacas_nivel_1.png",
+    "width": 1254,
+    "height": 1254,
+    "bytes": 2522077,
+    "pixelFormat": "Format32bppArgb",
+    "sha256": "1E8D2B3871DDD87C5BA312AE8D7ADC9237EB4780CDCE9A07B732F028F5BA5659",
+    "category": "cowShop"
+  },
+  {
+    "id": 31,
+    "file": "Ponto_de_venda_aliado.png",
+    "width": 1254,
+    "height": 1254,
+    "bytes": 2555690,
+    "pixelFormat": "Format32bppArgb",
+    "sha256": "62BFEA405824C59DC61037ED5D677344715621866FB26E5F713CAECF9D3BBCFA",
+    "category": "sale"
+  },
+  {
+    "id": 32,
+    "file": "ponto_de_venda_inicial_seu_ze.png",
+    "width": 1254,
+    "height": 1254,
+    "bytes": 2781313,
+    "pixelFormat": "Format32bppArgb",
+    "sha256": "9D87A180C2E17198662995FB039529A3B0BF630C7399F3FF9D15F20795FB7FE9",
+    "category": "sale"
+  },
+  {
+    "id": 33,
+    "file": "Ponto_de_venda_inimiga.png",
+    "width": 1254,
+    "height": 1254,
+    "bytes": 2824776,
+    "pixelFormat": "Format32bppArgb",
+    "sha256": "E8A4E97206E1E40B9B355E774B670A89D3510D298876E821021C5882690C23A1",
+    "category": "sale"
+  },
+  {
+    "id": 34,
+    "file": "Ponto_de_venda_neutro.png",
+    "width": 1254,
+    "height": 1254,
+    "bytes": 2691750,
+    "pixelFormat": "Format32bppArgb",
+    "sha256": "CA2DEF4690B4655E8B528D693E51726548FD7558DCF13B903A038A85F7A1FBFC",
+    "category": "sale"
+  },
+  {
+    "id": 35,
+    "file": "queijo_comum.png",
+    "width": 1254,
+    "height": 1254,
+    "bytes": 794844,
+    "pixelFormat": "Format32bppArgb",
+    "sha256": "091CD831DD71F53167B14277217EEFAABFE7D486681EF2006E4C0ED08528DD50",
+    "category": "cheese"
+  },
+  {
+    "id": 36,
+    "file": "queijo_fraco.png",
+    "width": 1254,
+    "height": 1254,
+    "bytes": 1018257,
+    "pixelFormat": "Format32bppArgb",
+    "sha256": "69D92C2FE9A51F991BC308FCC4A0B4AE9BDD5DC23C7AF937D50B13A0CAEF2207",
+    "category": "cheese"
+  },
+  {
+    "id": 37,
+    "file": "queijo_magico.png",
+    "width": 1254,
+    "height": 1254,
+    "bytes": 2169763,
+    "pixelFormat": "Format32bppArgb",
+    "sha256": "68CAD5BB2CD94406ADB64FA71F569EB1C8EBD8A37FEA07E2A7FE7682E3DCD2B0",
+    "category": "cheese"
+  },
+  {
+    "id": 38,
+    "file": "queijo_nobre.png",
+    "width": 1254,
+    "height": 1254,
+    "bytes": 1334069,
+    "pixelFormat": "Format32bppArgb",
+    "sha256": "E3190B0A72591487F745BECBF0E8886F32CE617138D60234D2BEE6D487008910",
+    "category": "cheese"
+  },
+  {
+    "id": 39,
+    "file": "queijo_radioativo.png",
+    "width": 1254,
+    "height": 1254,
+    "bytes": 1613050,
+    "pixelFormat": "Format32bppArgb",
+    "sha256": "FD31DCA84DDC305F8E625AC9CA8FD64F508BF3A0EB59D2189E8BE63C6E68911F",
+    "category": "cheese"
+  },
+  {
+    "id": 40,
+    "file": "transportadora_nivel_1.png",
+    "width": 1254,
+    "height": 1254,
+    "bytes": 2514556,
+    "pixelFormat": "Format32bppArgb",
+    "sha256": "9B4F3BA1F6D0F03438CD7C8E6BC21185C897CB5988480B9EE9DF098032F16F3D",
+    "category": "logistics"
+  },
+  {
+    "id": 41,
+    "file": "Trio de Bandoleiros Mascarados em Combate.png",
+    "width": 1254,
+    "height": 1254,
+    "bytes": 2712341,
+    "pixelFormat": "Format32bppArgb",
+    "sha256": "CE470BA4D17DEB22E29D29F2F6F622BCE1C2F6F1FBB9CFB95D24519CF2F739DC",
+    "category": "securityTeam"
+  },
+  {
+    "id": 42,
+    "file": "Trio de Mercenários Mascarados do Oeste.png",
+    "width": 1312,
+    "height": 1199,
+    "bytes": 2454996,
+    "pixelFormat": "Format32bppArgb",
+    "sha256": "6327FFABB5648FA1832E631E9F74C781D3BFD425722B42CEE9814FCB33D208A8",
+    "category": "securityTeam"
+  },
+  {
+    "id": 43,
+    "file": "vaca_magica.png",
+    "width": 1305,
+    "height": 1205,
+    "bytes": 2442624,
+    "pixelFormat": "Format32bppArgb",
+    "sha256": "277BA9611FBA58E602D3BA490EB5E22CF5185B8D2D363CDFAD4CA8A977D3893F",
+    "category": "cow"
+  },
+  {
+    "id": 44,
+    "file": "vaca_magrela.png",
+    "width": 1304,
+    "height": 1206,
+    "bytes": 1319589,
+    "pixelFormat": "Format32bppArgb",
+    "sha256": "70D2D16EB2613B3D4B9318061D34D8003686431108FD18BEB4608C99FF80656B",
+    "category": "cow"
+  },
+  {
+    "id": 45,
+    "file": "vaca_mimosa.png",
+    "width": 1305,
+    "height": 1206,
+    "bytes": 1555655,
+    "pixelFormat": "Format32bppArgb",
+    "sha256": "E9B4D921A3EAA260381DC9F24DF5EC47CFE87267E743F0BC2AD9399A7B7C2BC8",
+    "category": "cow"
+  },
+  {
+    "id": 46,
+    "file": "vaca_premiada.png",
+    "width": 1305,
+    "height": 1206,
+    "bytes": 2030230,
+    "pixelFormat": "Format32bppArgb",
+    "sha256": "D9151EEA647BCCE70A8CAA292E745B35B3A9EEB719DAA7BAB489460D0E5056EB",
+    "category": "cow"
+  },
+  {
+    "id": 47,
+    "file": "vaca_radioativa.png",
+    "width": 1305,
+    "height": 1205,
+    "bytes": 2283041,
+    "pixelFormat": "Format32bppArgb",
+    "sha256": "E6F3C897975286D18217B60EF06246E9307788B35108BFE4A7DB8B95D4B35F73",
+    "category": "cow"
+  },
+  {
+    "id": 48,
+    "file": "rural-open-v1.png",
+    "width": 1536,
+    "height": 1024,
+    "bytes": 3076653,
+    "pixelFormat": "Format24bppRgb",
+    "sha256": "73728B28CB2B64608DFCFC70286878B212A943F90B4636EF53699D838CE44E14",
+    "category": "map",
+    "source": "image_gen built-in 2026-10-14"
+  },
+  {
+    "id": 49,
+    "file": "rural-village-v2.png",
+    "width": 1536,
+    "height": 1024,
+    "bytes": 3292856,
+    "pixelFormat": "Format24bppRgb",
+    "sha256": "9E6D6A3DE30C4F4ECB940164B6CA54FD470B49849FB842145BAE155050CD5EFF",
+    "category": "map",
+    "source": "image_gen built-in 2026-10-14"
+  },
+  {
+    "id": 50,
+    "file": "rural-dirt-road-v1.png",
+    "width": 2172,
+    "height": 724,
+    "bytes": 2276324,
+    "pixelFormat": "Format32bppArgb",
+    "sha256": "9575476B7E9976B5DABE51C14552EA3E790CD8F9CAFB9A5D84459767F9A42CFA",
+    "category": "map",
+    "source": "image_gen built-in 2026-10-14"
+  },
+  {
+    "id": 51,
+    "file": "icon_money.png",
+    "width": 1254,
+    "height": 1254,
+    "bytes": 1123200,
+    "pixelFormat": "Format32bppArgb",
+    "sha256": "FB22E78D1E7C5F3EF9C2D8F2D01A9ED304FCDA668FAD4D708A1964E27641A09B",
+    "category": "icon",
+    "source": "PNG fornecido pelo usuário, assets/"
+  },
+  {
+    "id": 52,
+    "file": "icon_leite.png",
+    "width": 1254,
+    "height": 1254,
+    "bytes": 1504244,
+    "pixelFormat": "Format32bppArgb",
+    "sha256": "A06BDE9A2776784F11638EEBD4163EF155D24569229141E0AB18F740EBF82B36",
+    "category": "icon",
+    "source": "PNG fornecido pelo usuário, assets/"
+  },
+  {
+    "id": 53,
+    "file": "icon_queijo.png",
+    "width": 1254,
+    "height": 1254,
+    "bytes": 1470249,
+    "pixelFormat": "Format32bppArgb",
+    "sha256": "CF11869D783295A2712369C1BA9B9D3C908747D6EE4D8430A2FD4D4515ECD508",
+    "category": "icon",
+    "source": "PNG fornecido pelo usuário, assets/"
+  },
+  {
+    "id": 54,
+    "file": "icon_ataque.png",
+    "width": 1254,
+    "height": 1254,
+    "bytes": 2301705,
+    "pixelFormat": "Format32bppArgb",
+    "sha256": "925B09735A0A1405136E114B428836E9DA762FBF1D6E1E87A96D2F6E12E4DBFE",
+    "category": "icon",
+    "source": "PNG fornecido pelo usuário, assets/"
+  },
+  {
+    "id": 55,
+    "file": "icon_defesa.png",
+    "width": 1254,
+    "height": 1254,
+    "bytes": 1947108,
+    "pixelFormat": "Format32bppArgb",
+    "sha256": "4608C3783762C02E10569D6BE2C3F479EAB1BB8785D36A203ABCB922E6351203",
+    "category": "icon",
+    "source": "PNG fornecido pelo usuário, assets/"
+  },
+  {
+    "id": 56,
+    "file": "capangas_aliado_nivel_3.png",
+    "width": 1312,
+    "height": 1199,
+    "bytes": 2454996,
+    "pixelFormat": "Format32bppArgb",
+    "sha256": "6327FFABB5648FA1832E631E9F74C781D3BFD425722B42CEE9814FCB33D208A8",
+    "category": "team",
+    "source": "Alias sem edição do trio de veteranos fornecido pelo usuário; original preservado"
+  },
+  {
+    "id": 57,
+    "file": "capangas_inimigos_nivel_3.png",
+    "width": 1254,
+    "height": 1254,
+    "bytes": 2712341,
+    "pixelFormat": "Format32bppArgb",
+    "sha256": "CE470BA4D17DEB22E29D29F2F6F622BCE1C2F6F1FBB9CFB95D24519CF2F739DC",
+    "category": "team",
+    "source": "Alias sem edição do trio de veteranos fornecido pelo usuário; original preservado"
+  }
+]
