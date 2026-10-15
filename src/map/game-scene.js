@@ -1,4 +1,6 @@
 import Phaser from "phaser";
+import {installMapGestures} from "./gestures.js";
+import {mapAssetIds} from "./map-assets.js";
 import { contains } from "../domain/maps.js";
 import { total, attackStrength } from "../domain/game.js";
 import { collectorPosition, collectionAsset, shopAsset, guardAsset, combatIcons } from "./presentation.js";
@@ -16,33 +18,18 @@ export function mapScene({
 }) {
   return class GameMap extends Phaser.Scene {
     preload() {
-      for (const [id, url] of Object.entries(assets)) this.load.image(id, url);
+      const loading=document.createElement('div');
+      loading.className='map-loading';loading.setAttribute('role','status');
+      loading.textContent='Carregando mapa…';
+      this.game.canvas.parentElement.append(loading);this.loadingIndicator=loading;
+      this.load.on('progress',value=>{loading.textContent=`Carregando mapa… ${Math.round(value*100)}%`;});
+      for (const id of mapAssetIds(getMap())) this.load.image(id, assets[id]);
     }
     create() {
       this.staticObjects = [];
       this.dynamicObjects = [];
-      this.drag = null;
-      this.scale.on("resize",()=>this.constrain());
-      this.input.on("pointerdown", (p) => {
-        this.drag = { x: p.x, y: p.y, lastX: p.x, lastY: p.y, moved: false };
-      });
-      this.input.on("pointermove", (p) => {
-        const d = this.drag;
-        if (!p.isDown || !d) return;
-        if (Math.hypot(p.x - d.x, p.y - d.y) > 5) d.moved = true;
-        if (d.moved) {
-          const c = this.cameras.main;
-          c.scrollX -= (p.x - d.lastX) / c.zoom;
-          c.scrollY -= (p.y - d.lastY) / c.zoom;
-          this.constrain();
-        }
-        d.lastX = p.x;
-        d.lastY = p.y;
-      });
-      this.input.on("pointerup", (p) => {
-        const d = this.drag;
-        this.drag = null;
-        if (!d || d.moved) return;
+      this.scale.on("resize",()=>this.fit());
+      installMapGestures(this, (p) => {
         const pos = this.cameras.main.getWorldPoint(p.x, p.y);
         const map = getMap();
         if (!map) return;
@@ -70,23 +57,9 @@ export function mapScene({
           ordered.find((s) => contains(s.polygon, pos.x, pos.y));
         onSelect(slot?.id ?? null);
       });
-      this.input.on("wheel", (p, objects, dx, dy) => {
-        if (!getMap()) return;
-        const c = this.cameras.main,
-          before = c.getWorldPoint(p.x, p.y);
-        c.setZoom(Phaser.Math.Clamp(c.zoom * (dy > 0 ? 0.9 : 1.1), this.minimumZoom(), 3));
-        c.preRender();
-        const after = c.getWorldPoint(p.x, p.y);
-        c.scrollX += before.x - after.x;
-        c.scrollY += before.y - after.y;
-        this.constrain();
-      });
-      this.game.canvas.addEventListener("wheel", (e) => e.preventDefault(), {
-        passive: false,
-      });
       onReady(this);
       this.show();
-      if(!presentationOnly) this.focus('farm-ze');
+      this.loadingIndicator?.remove();
       this.game.canvas.dataset.ready = "true";
     }
     show() {
@@ -134,19 +107,36 @@ export function mapScene({
         width = map.width ?? img.width,
         height = map.height ?? img.height,
         c = this.cameras.main;
-      c.setBounds(0,0,width,height);
+      c.removeBounds();
       c.setZoom(this.minimumZoom());
       c.centerOn(width / 2, height / 2);
       this.constrain();
     }
     minimumZoom() {
       const map=getMap(),c=this.cameras.main;
-      return map?Math.max(c.width/map.width,c.height/map.height):0.25;
+      return map?Math.min(c.width/map.width,c.height/map.height):0.25;
     }
     constrain() {
-      const c=this.cameras.main;
-      c.setZoom(Math.max(c.zoom,this.minimumZoom()));
+      const c=this.cameras.main,map=getMap();
+      if(!map)return;
+      c.setZoom(Phaser.Math.Clamp(c.zoom,this.minimumZoom(),3));
+      // Center an axis when its terrain fits; otherwise keep panning on the map.
+      const halfW=c.width/(2*c.zoom),halfH=c.height/(2*c.zoom);
+      const x=c.scrollX+c.width/2,y=c.scrollY+c.height/2;
+      c.centerOn(halfW*2>=map.width?map.width/2:Phaser.Math.Clamp(x,halfW,map.width-halfW),
+        halfH*2>=map.height?map.height/2:Phaser.Math.Clamp(y,halfH,map.height-halfH));
       c.preRender();
+      Object.assign(this.game.canvas.dataset,{zoom:String(c.zoom),minimumZoom:String(this.minimumZoom()),scrollX:String(c.scrollX),scrollY:String(c.scrollY)});
+    }
+    zoomAt(factor,anchor,destination=anchor) {
+      const c=this.cameras.main;
+      c.preRender();
+      const before=c.getWorldPoint(anchor.x,anchor.y);
+      c.setZoom(Phaser.Math.Clamp(c.zoom*factor,this.minimumZoom(),3));
+      c.preRender();
+      const after=c.getWorldPoint(destination.x,destination.y);
+      c.scrollX+=before.x-after.x;c.scrollY+=before.y-after.y;
+      this.constrain();
     }
     focus(id) {
       const slot = getMap()?.slots.find((s) => s.id === id);
@@ -161,7 +151,7 @@ export function mapScene({
     }
     zoomBy(factor) {
       const c = this.cameras.main;
-      c.setZoom(Phaser.Math.Clamp(c.zoom * factor, this.minimumZoom(), 3));
+      this.zoomAt(factor,{x:c.width/2,y:c.height/2});
     }
     refresh() {
       this.dynamicObjects.forEach((o) => o.destroy());

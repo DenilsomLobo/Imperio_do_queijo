@@ -4,6 +4,14 @@
 .entry-eyebrow { color:#786858; font-size:.75rem; letter-spacing:.16em; }
 .entry-card h1 { margin:8px 0; font-size:1.9rem; }
 .entry-card p { line-height:1.6; color:#786858; }
+.start-guide { margin:20px 0; padding:16px; border:1px solid #D8C5A5; border-radius:12px; background:#F3E7CF; }
+.start-guide summary { cursor:pointer; color:#352719; font-weight:700; line-height:1.5; }
+.start-guide summary:focus-visible { outline:2px solid #52734D; outline-offset:4px; border-radius:3px; }
+.start-guide .start-goal { margin:12px 0; font-size:.9rem; }
+.start-guide ol { margin:0; padding-left:23px; }
+.start-guide li { padding-left:3px; margin:0 0 12px; font-size:.88rem; line-height:1.6; color:#594939; }
+.start-guide li strong { color:#352719; }
+.start-guide .start-controls { margin:12px 0 0; padding-top:12px; border-top:1px solid #D8C5A5; font-size:.82rem; }
 #entry-form { display:grid; gap:12px; margin:20px 0; }
 #entry-form input { width:100%; padding:13px; font-size:1rem; border:1px solid #D8C5A5; border-radius:8px; background:white; color:#352719; }
 #entry-form button { padding:13px; background:#52734D; color:#FFF8E7; border-radius:8px; border:0; font-size:1rem; }
@@ -17,7 +25,9 @@
 .entry-ranking { margin-top:20px; padding:8px 14px; border:1px solid #D8C5A5; border-radius:8px; background:#F3E7CF; color:#352719; }
 header {height:auto; min-height:88px; gap:12px;}
 header .brand { display:flex; flex-direction:row; align-items:center; gap:8px; flex-shrink:0; }
-.avatar-placeholder { display:block; width:38px; height:38px; visibility:hidden; }
+.portfolio-avatar { display:block; width:38px; height:38px; flex-shrink:0; border-radius:50%; }
+.portfolio-avatar img { display:block; width:100%; height:100%; object-fit:cover; border-radius:50%; }
+.portfolio-avatar:focus-visible { outline:3px solid #F2C14E; outline-offset:4px; }
 .brand-logo { display:block; width:210px; height:76px; object-fit:contain; }
 header .player-identity { display:flex; flex-direction:column; gap:4px; min-width:80px; max-width:160px; overflow-wrap:anywhere; }
 .player-identity small { font-size:.66rem; color:#FFF8E7; }
@@ -31,6 +41,6 @@ header .header-action { padding:5px 9px; min-height:44px; white-space:nowrap; }
 #management-bar .sector-card strong[data-metric="cash"],#management-bar .sector-card strong[data-metric="revenue"] {font-size:10.5px;letter-spacing:-.15px;white-space:nowrap;padding-right:0;}
 #ranking-dialog button { padding:9px 12px; background:#52734D; color:#FFF8E7; border:0; border-radius:8px; }
 @media(max-width:1150px){header {flex-wrap:wrap;} .brand-logo {width:170px;height:62px;} header #hud {margin-left:auto;} }
-@media(max-width:550px){.entry-screen {padding:12px;} .entry-card {padding:20px;} .entry-card h1 {font-size:1.5rem;} header .player-identity {max-width:115px;} .brand-logo {width:155px;height:56px;} .avatar-placeholder {width:28px;} #ranking-list li span {float:none;display:block;margin:4px 0 0;} }
+@media(max-width:550px){.entry-screen {padding:12px;} .entry-card {padding:20px;} .entry-card h1 {font-size:1.5rem;} header .player-identity {max-width:115px;} .brand-logo {width:155px;height:56px;} .portfolio-avatar {width:32px;height:32px;} #ranking-list li span {float:none;display:block;margin:4px 0 0;} }
 #app {grid-template-rows:auto auto minmax(0,1fr) 27px;}
 #app.entry-mode {display:block;overflow:auto;height:100dvh;}

@@ -1636,3 +1636,6 @@ Regra posterior vigente: o usuário autorizou ajustar a economia inicial dos doi
 - Menu Inimigos mostra última decisão e projeção real da IA, distinguindo estimativa de receita garantida. Campanhas antigas passam a usar a estratégia sem reset; metadado `company.strategy` é opcional e persistido.
 
 Detalhes e limitações em `docs/IA_ATUAL.md`. A IA é baseada em regras e orçamento, sem prever sorteios. Evoluções de planejamento de longo prazo continuam no roadmap; não declarar todo o mestre concluído.
+
+## Mapa e rodapé — 15/10/2026
+O mapa ocupa a altura restante após cabeçalho e cartões de gestão. Rodapé possui somente uma linha, com 27 pixels de altura, sem disputar a faixa flexível do mapa. Grade da partida tem quatro faixas; não reservar linha para a antiga barra de campanha, cujo progresso permanece apenas em Inimigos. Preservar navegação e painel sobreposto em desktop e celular.

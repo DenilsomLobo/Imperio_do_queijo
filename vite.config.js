@@ -2,6 +2,7 @@ import { defineConfig } from "vite";
 import { createHash } from "node:crypto";
 
 export default defineConfig({
+  base: "./",
   cacheDir: `node_modules/.vite-imperio-${process.pid}`,
   plugins: [
     {
@@ -23,6 +24,7 @@ export default defineConfig({
     },
   ],
   build: {
+    outDir: "play",
     target: "es2022",
     rollupOptions: { input: { game: "index.html" } },
   },

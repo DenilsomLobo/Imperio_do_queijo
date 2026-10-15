@@ -7,6 +7,8 @@
     "check:repo": "node scripts/check-repository.mjs",
     "start": "node scripts/start-game.mjs",
     "dev": "vite --host 127.0.0.1",
+    "prebuild": "node scripts/optimize-assets.mjs",
+    "predev": "node scripts/optimize-assets.mjs",
     "build": "vite build",
     "test": "vitest run",
     "test:browser": "node scripts/qa-browser.mjs",
@@ -18,6 +20,7 @@
   "devDependencies": {
     "fake-indexeddb": "^6.2.5",
     "playwright-core": "^1.64.0",
+    "sharp": "^0.35.5",
     "vite": "^7.0.0",
     "vitest": "^5.0.4"
   }

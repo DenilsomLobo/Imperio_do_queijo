@@ -1,5 +1,6 @@
 import {playerEntry,rankingUI} from './ui/player-entry.js';
 import {cloud} from './persistence/firebase.js';
+import avatarUrl from '../assets-web/portfolio-avatar.webp';
 import {combatUpgradeCards} from './ui/combat-upgrades.js';
 import {sharedShopStock,shopCapacity,shopBonus,companyShops,salePrice} from './domain/shop-stock.js';
 import {auctionInfo,auctionActions} from "./ui/auctions.js";
@@ -24,6 +25,7 @@ import "./sector-menu.css";
 import "./map-layout.css";
 import './campaign.css';
 import './player-entry.css';
+import './mobile.css';
 import { ruralMap } from "./data/world.js";
 import { rules, DAY } from "./data/game-rules.js";
 import {
@@ -49,7 +51,8 @@ let state,
   lastSave = 0,
   saveChain = Promise.resolve(),
   storageFailed = false,
-  resettingCampaign = false;
+  resettingCampaign = false,
+  clockPaused = document.hidden;
 const $ = (id) => document.getElementById(id);
 const supplyDrafts=new Map();
 const money = (n) =>
@@ -71,7 +74,7 @@ const escape = (s) =>
       ],
   );
 let activeProfile;
-const ranking=rankingUI(assets,()=>activeProfile);
+const ranking=rankingUI(assets);
 activeProfile=await playerEntry(assets,ranking);
 function freshCampaign(){const s=createGame();s.campaignId='rural-'+crypto.randomUUID();s.playerProfile={...activeProfile};return s;}
 document.querySelector('#app').classList.remove('entry-mode');
@@ -82,10 +85,10 @@ function queueCloud(snapshot,force=false){
  if(!force && Date.now()-lastCloudSave<60000)return;
  lastCloudSave=Date.now();
  $('cloud-state').textContent='Sincronizando…';
- cloud.save(snapshot).then(()=>{$('cloud-state').textContent='Salvo na nuvem';}).catch(e=>{$('cloud-state').textContent='Salvo localmente · nuvem pendente';$('cloud-state').title=e.message;});
+ return cloud.save(snapshot).then(()=>{$('cloud-state').textContent='Salvo na nuvem';}).catch(e=>{$('cloud-state').textContent='Salvo localmente · nuvem pendente';$('cloud-state').title=e.message;});
 }
 document.querySelector("#app").innerHTML =
-  `<header><div class="brand"><a class="avatar-placeholder" href="./index.html" aria-hidden="true" tabindex="-1"></a><a id="home-logo" href="./index.html" aria-label="Voltar à página inicial"><img class="brand-logo" src="${assets["text_logo.png"]}" alt="Império do Queijo"></a></div><div class="player-identity"><strong id="player-label"></strong><small id="cloud-state">Salvamento local</small></div><div id="hud"></div><label class="speed">Velocidade <select id="speed" title="Dia: 60 s / 30 s / 10 s"><option value="1">1× · dia em 1 min</option><option value="2">2× · dia em 30 s</option><option value="4">4× · dia em 10 s</option></select></label><button id="save" class="header-action"><img src="${assets["icon_salvar.png"]}" alt="">Salvar</button><button id="reset-campaign" class="header-action danger-button" disabled><img src="${assets["icon_resetar.png"]}" alt="">Resetar</button><button id="ranking" class="header-action"><img src="${assets["icon_ranking.png"]}" alt="">Ranking</button></header><section id="management-bar" aria-label="Gestão da empresa"></section><main><section id="map"></section><aside id="property-menu" aria-label="Gestão da propriedade" hidden><button id="close-property" type="button" aria-label="Fechar menu da propriedade" title="Fechar menu">✕</button><div class="panel-eyebrow">PROPRIEDADE SELECIONADA</div><h2 id="title">Zona rural</h2><div id="property-portrait"></div><p id="intro">Clique nas construções para gerenciar. Os círculos em frente às lojas mostram quem controla cada ponto.</p><div id="panel"></div><p id="status" role="status">Carregando campanha…</p><button id="pending" hidden>Resolver incidentes pendentes</button><details><summary>Relatórios e finanças</summary><div id="reports"></div></details></aside></main><footer>Arraste para explorar · roda do mouse para zoom · ícones dourados coletam recursos.</footer><dialog id="management-dialog" aria-labelledby="management-title"><div class="dialog-heading"><img id="management-sector-image" alt="" width="64" height="64" hidden><div><small>GESTÃO DO IMPÉRIO</small><h2 id="management-title"></h2></div><button data-close aria-label="Fechar gestão">✕</button></div><div id="management-content"></div></dialog>`;
+  `<header><div class="brand"><a id="portfolio-avatar" class="portfolio-avatar" href="https://portifolio-denilsom-lobo.web.app/" aria-label="Voltar à página inicial de Denilsom Lobo"><img src="${avatarUrl}" alt="Denilsom Lobo" width="38" height="38"></a><a id="home-logo" href="./index.html" aria-label="Voltar à página inicial"><img class="brand-logo" src="${assets["text_logo.png"]}" alt="Império do Queijo"></a></div><div class="player-identity"><strong id="player-label"></strong><small id="cloud-state">Salvamento local</small></div><div id="hud"></div><label class="speed">Velocidade <select id="speed" title="Dia: 60 s / 30 s / 10 s"><option value="1">1× · dia em 1 min</option><option value="2">2× · dia em 30 s</option><option value="4">4× · dia em 10 s</option></select></label><button id="save" class="header-action"><img src="${assets["icon_salvar.png"]}" alt="">Salvar</button><button id="reset-campaign" class="header-action danger-button" disabled><img src="${assets["icon_resetar.png"]}" alt="">Resetar</button><button id="ranking" class="header-action"><img src="${assets["icon_ranking.png"]}" alt="">Ranking</button></header><section id="management-bar" aria-label="Gestão da empresa"></section><main><section id="map"></section><aside id="property-menu" aria-label="Gestão da propriedade" hidden><button id="close-property" type="button" aria-label="Fechar menu da propriedade" title="Fechar menu">✕</button><div class="panel-eyebrow">PROPRIEDADE SELECIONADA</div><h2 id="title">Zona rural</h2><div id="property-portrait"></div><p id="intro">Clique nas construções para gerenciar. Os círculos em frente às lojas mostram quem controla cada ponto.</p><div id="panel"></div><p id="status" role="status">Carregando campanha…</p><button id="pending" hidden>Resolver incidentes pendentes</button><details><summary>Relatórios e finanças</summary><div id="reports"></div></details></aside></main><footer>Arraste o mapa · dois dedos ou roda do mouse para zoom · ícones dourados coletam recursos.</footer><dialog id="management-dialog" aria-labelledby="management-title"><div class="dialog-heading"><img id="management-sector-image" alt="" width="64" height="64" hidden><div><small>GESTÃO DO IMPÉRIO</small><h2 id="management-title"></h2></div><button data-close aria-label="Fechar gestão">✕</button></div><div id="management-content"></div></dialog>`;
 const dashboard = managementUI({
   getState: () => state,
   assets,
@@ -381,7 +384,7 @@ function selectProperty(id) {
 }
 function syncClock() {
   const now = Date.now();
-  if(resettingCampaign) {lastReal=now;return;}
+  if(resettingCampaign || clockPaused) {lastReal=now;return;}
   state = advance(state, Math.max(0, now - lastReal) * rules.speedFactors[state.speed]);
   lastReal = now;
 }
@@ -394,7 +397,8 @@ async function persist(forceCloud=false) {
     await saveChain;
     $("save").title = "Jogo salvo";
     if(!cloud.enabled())$('cloud-state').textContent='Salvo neste navegador';
-    queueCloud(snapshot,forceCloud);
+    const cloudSave=queueCloud(snapshot,forceCloud);
+    if(forceCloud)await cloudSave;
     return true;
   } catch (e) {
     status(`Falha ao salvar: ${e.message}`);
@@ -547,10 +551,7 @@ try {
     await save(state);
   }
   if (state) {
-    state = advance(state, Math.max(0, Date.now() - state.savedAt), {
-      offline: true,
-    });
-    status("Campanha local carregada. Progresso offline calculado em 1×.");
+    status("Campanha carregada. O tempo ficou pausado enquanto você estava fora.");
   } else {
     state = freshCampaign();
     status(
@@ -568,10 +569,12 @@ state.playerProfile={...activeProfile};
 $("player-label").textContent=activeProfile.name;
 if(storageFailed)$('cloud-state').textContent='Sessão sem gravação · erro no save';
 else if(!cloud.enabled())$("cloud-state").textContent='Local · Firebase não configurado';
-$("ranking").onclick=()=>ranking.open();
-$("home-logo").onclick=async e=>{
+$("ranking").onclick=async()=>{await persist(true);ranking.open();};
+for(const link of [$("home-logo"),$("portfolio-avatar")])link.onclick=async e=>{
   e.preventDefault();const destination=e.currentTarget.href;syncClock();
+  clockPaused=true;
   if(await persist(true))window.location.assign(destination);
+  else {lastReal=Date.now();clockPaused=document.hidden;}
 };
 await persist();
 document.querySelector('#app').inert=false;
@@ -596,7 +599,7 @@ new Phaser.Game({
   scene: Scene,
 });
 setInterval(() => {
-  if(resettingCampaign) return;
+  if(resettingCampaign || clockPaused) return;
   syncClock();
   refresh();
   if (Date.now() - lastSave > 15000) {
@@ -604,7 +607,19 @@ setInterval(() => {
     persist();
   }
 }, 1000);
-document.addEventListener("visibilitychange", () => {
+function pauseSession() {
+  if(clockPaused)return;
   syncClock();
-  persist();
+  clockPaused=true;
+  void persist(true);
+}
+function resumeSession() {
+  lastReal=Date.now();
+  clockPaused=document.hidden;
+}
+document.addEventListener("visibilitychange", () => {
+  if(document.hidden)pauseSession();
+  else resumeSession();
 });
+window.addEventListener("pagehide",pauseSession);
+window.addEventListener("pageshow",resumeSession);

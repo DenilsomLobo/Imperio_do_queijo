@@ -15,3 +15,29 @@
 .finance-table th,.finance-table td {padding:9px;border-bottom:1px solid #D8C5A5;}
 .finance-table td:not(:first-child) {font-variant-numeric:tabular-nums;white-space:nowrap;}
 .supply-quote {font-weight:600;color:#3D5A38;}
+
+/* A single rival shop should occupy one card, not stretch into a full-width square. */
+.enemy-management .owned-resource-grid,
+.enemy-management .building-grid {grid-template-columns:repeat(auto-fill,minmax(min(100%,200px),1fr));gap:12px;align-items:start;}
+.enemy-management .owned-resource-art,
+.enemy-management .building-art {width:100%;height:128px;aspect-ratio:auto;flex:none;}
+.enemy-management .owned-resource-art img,
+.enemy-management .building-art>img {width:100%;height:100%;max-width:160px;max-height:128px;object-fit:contain;}
+.enemy-management .owned-resource-card,
+.enemy-management .building-card {padding:10px;gap:6px;}
+.enemy-management .owned-resource-card>strong,
+.enemy-management .building-card>strong {font-size:.9rem;line-height:1.4;}
+@media(max-width:600px){
+ .enemy-management .owned-resource-grid,
+ .enemy-management .building-grid {grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
+ .enemy-management .owned-resource-art,
+ .enemy-management .building-art {height:96px;}
+ .enemy-management .owned-resource-art img,
+ .enemy-management .building-art>img {max-width:120px;max-height:96px;}
+ .enemy-management .owned-resource-card,
+ .enemy-management .building-card {padding:8px;}
+ .enemy-management .owned-resource-card>strong,
+ .enemy-management .building-card>strong {font-size:.8rem;}
+ .enemy-management .owned-resource-card>span:not(.owned-resource-art),
+ .enemy-management .building-card>span:not(.building-art) {font-size:.75rem;line-height:1.45;}
+}

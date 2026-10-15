@@ -1,0 +1,31 @@
+/* Keep the identity, clock, speed and actions in predictable rows. */
+@media(max-width:700px){
+ #app>header {display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;min-height:0;padding:8px 10px;align-items:center;}
+ header .brand {grid-column:span 4;gap:8px;min-width:0;}
+ header .brand-logo {width:156px;max-width:100%;height:52px;}
+ header .portfolio-avatar {width:32px;height:32px;}
+ header .player-identity {grid-column:span 2;min-width:0;max-width:none;gap:3px;text-align:right;}
+ header .player-identity strong {font-size:.8rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+ header .player-identity small {font-size:.6rem;line-height:1.3;}
+ header #hud {grid-column:span 3;display:flex;min-width:0;margin:0;font-size:.75rem;gap:6px;}
+ header #hud>span {display:block;}
+ header #hud>span:last-child {display:none;}
+ header .speed {grid-column:span 3;min-width:0;margin:0;display:flex;align-items:center;gap:6px;font-size:.65rem;}
+ header .speed select {min-width:0;flex:1;width:0;margin:0;padding:6px 4px;font-size:.7rem;min-height:34px;}
+ header .header-action {grid-column:span 2;width:100%;min-width:0;min-height:40px;padding:5px;gap:5px;font-size:.73rem;}
+ header .header-action img {width:25px;height:25px;}
+ #management-bar {padding:5px 8px;overflow:hidden;}
+ #management-bar .sector-grid {gap:6px;padding:0 0 4px;align-items:stretch;}
+ #management-bar .sector-card {flex:0 0 148px;min-height:56px;margin:0;padding:6px;grid-template-columns:28px minmax(0,1fr);gap:2px 6px;}
+ #management-bar .sector-art img {width:28px;height:28px;}
+ #management-bar .sector-label {font-size:9px;}
+ #management-bar .sector-card strong {font-size:11px;line-height:1.25;}
+ #app>main {height:auto;min-height:0;}
+ #app>footer {font-size:10px;padding:0 8px;}
+}
+@media(max-width:360px){
+ header .brand-logo {width:132px;height:46px;}
+ header .brand {gap:6px;}
+ header .speed {font-size:0;}
+ header .speed select {font-size:.7rem;}
+}
