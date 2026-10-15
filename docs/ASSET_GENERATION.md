@@ -2,7 +2,7 @@
 
 Ferramenta: image_gen integrada, sem fallback CLI/API. Uso: stylized-concept, fundo bitmap para composição com os PNGs existentes.
 
-Arquivo final: `assets/rural-open-v1.png` (1536×1024), exibido em espaço lógico 2400×1600. Novo arquivo; os cinco cenários antigos permanecem no catálogo como referências. Metadados/SHA-256 em assets-inventory.json.
+Arquivo final: `assets/mapas/rural-open-v1.png` (1536×1024), exibido em espaço lógico 2400×1600. Novo arquivo; os cinco cenários antigos permanecem no catálogo como referências. Metadados/SHA-256 em assets-inventory.json.
 
 ## Prompt final
 
@@ -14,4 +14,4 @@ Imagem examinada: gramado central livre, margem decorada, área vermelha a norde
 
 ## Cenário rural atualizado
 
-Novo asset assets/rural-village-v2.png gerado pela ferramenta integrada image_gen, preservando as referências originais. Prompt final completo e parâmetros em RURAL_MAP_V2.md.
+Novo asset assets/mapas/rural-village-v2.png gerado pela ferramenta integrada image_gen, preservando as referências originais. Prompt final completo e parâmetros em RURAL_MAP_V2.md.

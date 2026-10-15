@@ -22,6 +22,7 @@ export function mapScene({
       this.staticObjects = [];
       this.dynamicObjects = [];
       this.drag = null;
+      this.scale.on("resize",()=>this.constrain());
       this.input.on("pointerdown", (p) => {
         this.drag = { x: p.x, y: p.y, lastX: p.x, lastY: p.y, moved: false };
       });
@@ -33,6 +34,7 @@ export function mapScene({
           const c = this.cameras.main;
           c.scrollX -= (p.x - d.lastX) / c.zoom;
           c.scrollY -= (p.y - d.lastY) / c.zoom;
+          this.constrain();
         }
         d.lastX = p.x;
         d.lastY = p.y;
@@ -72,17 +74,19 @@ export function mapScene({
         if (!getMap()) return;
         const c = this.cameras.main,
           before = c.getWorldPoint(p.x, p.y);
-        c.setZoom(Phaser.Math.Clamp(c.zoom * (dy > 0 ? 0.9 : 1.1), 0.25, 3));
+        c.setZoom(Phaser.Math.Clamp(c.zoom * (dy > 0 ? 0.9 : 1.1), this.minimumZoom(), 3));
         c.preRender();
         const after = c.getWorldPoint(p.x, p.y);
         c.scrollX += before.x - after.x;
         c.scrollY += before.y - after.y;
+        this.constrain();
       });
       this.game.canvas.addEventListener("wheel", (e) => e.preventDefault(), {
         passive: false,
       });
       onReady(this);
       this.show();
+      if(!presentationOnly) this.focus('farm-ze');
       this.game.canvas.dataset.ready = "true";
     }
     show() {
@@ -100,6 +104,11 @@ export function mapScene({
             .setDisplaySize(map.width ?? img.width, map.height ?? img.height),
         );
         this.staticObjects.push(drawStreets(this, map));
+        if(map.id==='rural' && this.textures.exists('comece_flag.png')) {
+          const flag=this.add.image(190,1920,'comece_flag.png').setOrigin(0.5,1).setDepth(10005);
+          flag.setDisplaySize(230,230*flag.height/flag.width);
+          this.staticObjects.push(flag);
+        }
         for (const s of map.slots) {
           if (s.type !== "security" && s.building) {
             const o = this.add
@@ -125,8 +134,19 @@ export function mapScene({
         width = map.width ?? img.width,
         height = map.height ?? img.height,
         c = this.cameras.main;
-      c.setZoom(Math.min(c.width / width, c.height / height));
+      c.setBounds(0,0,width,height);
+      c.setZoom(this.minimumZoom());
       c.centerOn(width / 2, height / 2);
+      this.constrain();
+    }
+    minimumZoom() {
+      const map=getMap(),c=this.cameras.main;
+      return map?Math.max(c.width/map.width,c.height/map.height):0.25;
+    }
+    constrain() {
+      const c=this.cameras.main;
+      c.setZoom(Math.max(c.zoom,this.minimumZoom()));
+      c.preRender();
     }
     focus(id) {
       const slot = getMap()?.slots.find((s) => s.id === id);
@@ -136,11 +156,12 @@ export function mapScene({
           slot.sprite.x,
           slot.sprite.y - slot.sprite.width * 0.4,
         );
+        this.constrain();
       }
     }
     zoomBy(factor) {
       const c = this.cameras.main;
-      c.setZoom(Phaser.Math.Clamp(c.zoom * factor, 0.25, 2));
+      c.setZoom(Phaser.Math.Clamp(c.zoom * factor, this.minimumZoom(), 3));
     }
     refresh() {
       this.dynamicObjects.forEach((o) => o.destroy());
@@ -165,8 +186,9 @@ export function mapScene({
           draw.fillEllipse(s.sprite.x,s.sprite.y,74,42);
           draw.lineStyle(selected?4:2,color,1);
           draw.strokeEllipse(s.sprite.x,s.sprite.y,74,42);
-          const image = this.add.image(s.sprite.x,s.sprite.y,guardAsset(p)).setOrigin(0.5,1).setDepth(10001);
-          const width = p.team ? 88 : 68;
+          const guard=guardAsset(p);
+          const image = this.add.image(s.sprite.x,s.sprite.y,guard).setOrigin(0.5,1).setDepth(10001);
+          const width = guard.startsWith("bandeira_") ? 68 : 88;
           image.setDisplaySize(width,width*image.height/image.width);
           this.dynamicObjects.push(image);
           if (!presentationOnly) combatIcons(state,p.id).forEach((asset,i)=>{
@@ -184,6 +206,7 @@ export function mapScene({
         }
         if (presentationOnly || !s.building) continue;
         this.label(s.sprite.x,s.sprite.y+8,s.name,18,true);
+        if(p.staffNotices?.length) this.label(s.sprite.x,s.sprite.y+65,p.type==="security"?"Capangas pediram demissão":"Funcionários pediram demissão",14,true);
         const asset = collectionAsset(p);
         if (asset) {
           const {x,y}=collectorPosition(s);

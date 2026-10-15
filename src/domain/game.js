@@ -1,6 +1,13 @@
+import {placeBid,finishAuctions,validateAuctions,auctionDecision,serviceKind} from "./auctions.js";
+import {propertyPurchasePrice,factoryProfile} from "../data/game-rules.js";
+import {processLogistics,validateLogistics} from "./logistics.js";
+import { CLOCK_VERSION, migrateClock } from "./clock-migration.js";
+import { bankPlan, validateBankContract, recordDailyEntry, ensureBankState, settleBankFees, payBankDebt, closeBankDays, processBankServices } from "./banking.js";
+import { activeWorkers, productionMultiplier, workerCapacity, processWorkerPayroll } from "./workers.js";
+import { dairy, discoveredMilk } from "../data/dairy.js";
 import { ruralMap } from "../data/world.js";
 import { rules, DAY } from "../data/game-rules.js";
-import { finalPurchaseAllowed, updateCampaign } from './campaign.js';
+import { updateCampaign } from './campaign.js';
 import reset from '../data/session-reset.json';
 
 export const total = (stock) =>
@@ -23,7 +30,7 @@ function ledger(
   c.cash += amount;
   c.revenue += revenue;
   c.expenses += expense;
-  s.ledger.push({
+  const entry = {
     id: s.nextId++,
     time: s.time,
     owner,
@@ -32,7 +39,9 @@ function ledger(
     property,
     revenue,
     expense,
-  });
+  };
+  s.ledger.push(entry);
+  recordDailyEntry(c,entry);
 }
 function spend(s, owner, cents, kind, id) {
   ledger(s, owner, -cents, kind, id, 0, cents);
@@ -54,6 +63,7 @@ function team(s, owner) {
 export function createGame(now = Date.now()) {
   const s = {
     version: 1,
+    clockVersion:CLOCK_VERSION,
     resetRevision: reset.revision,
     layoutVersion: 3,
     rulesVersion: rules.version,
@@ -67,18 +77,27 @@ export function createGame(now = Date.now()) {
     companies: {
       player: {
         name: "Império do Queijo",
+        bank:null,
+        logistics:null,
+        bankDebt:0,
         cash: rules.initialCash,
         revenue: 0,
         expenses: 0,
+        discoveredMilk: ["weak"],
       },
       coalho: {
         name: "Família Coalho",
+        bank:null,
+        logistics:null,
+        bankDebt:0,
         cash: rules.aiCash,
+        discoveredMilk: ["weak"],
         revenue: 0,
         expenses: 0,
       },
     },
     properties: {},
+    auctions: {},
     missions: [],
     reports: [],
     ledger: [],
@@ -96,17 +115,22 @@ export function createGame(now = Date.now()) {
       Object.assign(p, {
         cows: ["farm-ze", "farm-coalho"].includes(slot.id) ? { weak: 1 } : {},
         milk: { weak: 0 },
+        milkProgress: {},
         feed: 0,
+        cowAges: ["farm-ze", "farm-coalho"].includes(slot.id) ? {weak:[0]} : {},
       });
     if (slot.type === "factory")
       Object.assign(p, {
-        milk: { weak: slot.id === "factory-ze" ? rules.initialMilk : 0 },
-        packaging: slot.id === "factory-ze" ? rules.initialPackaging : 0,
+        milk: { weak: ["factory-ze","factory-coalho"].includes(slot.id) ? rules.initialMilk : 0 },
+        milkProgress: {},
+        packaging: ["factory-ze","factory-coalho"].includes(slot.id) ? rules.initialPackaging : 0,
         ready:
-          slot.id === "factory-ze"
-            ? { "frescal:weak": rules.initialCheese }
+          ["factory-ze","factory-coalho"].includes(slot.id)
+            ? { "weak:weak": rules.initialCheese }
             : {},
         batches: [],
+        workers: [],
+        staffNotices: [],
       });
     if (slot.type === "sale")
       Object.assign(p, {
@@ -120,16 +144,12 @@ export function createGame(now = Date.now()) {
         securityId: slot.securityId,
       });
     if (slot.type === "security")
-      Object.assign(p, { saleId: slot.saleId, team: null, barricade: 0 });
+      Object.assign(p, { saleId: slot.saleId, team: null, barricade: 0, staffNotices: [] });
     s.properties[p.id] = p;
   }
   ledger(s, "player", 0, "Saldo de abertura");
   ledger(s, "coalho", 0, "Saldo de abertura");
-  for (const p of Object.values(s.properties))
-    if (p.owner === "coalho" && p.type === "security") {
-      spend(s, "coalho", rules.teamHire, "Equipe inicial", p.id);
-      p.team = team(s, "coalho");
-    }
+
   return s;
 }
 export function attackStrength(t, time) {
@@ -158,6 +178,11 @@ export function distance(a, b) {
   requireThat(x && y, "Posto inexistente.");
   return Math.hypot(x.sprite.x - y.sprite.x, x.sprite.y - y.sprite.y);
 }
+export function roadConnected(from, to) {
+  const a=ruralMap.slots.find(p=>p.id===from), b=ruralMap.slots.find(p=>p.id===to);
+  const saleA=a?.type==='security'?a.saleId:a?.id, saleB=b?.type==='security'?b.saleId:b?.id;
+  return Boolean(saleA && saleB && saleA!==saleB && ruralMap.roads.some(r=>(r.from===saleA&&r.to===saleB)||(r.from===saleB&&r.to===saleA)));
+}
 export function estimate(s, from, to) {
   const a = s.properties[from],
     d = s.properties[to];
@@ -172,6 +197,7 @@ export function estimate(s, from, to) {
     defense,
     chance: chance(attack, defense),
     distance: distance(from, to),
+    connected: roadConnected(from,to),
     cost: rules.attackCost,
     duration: rules.attackDuration,
   };
@@ -212,16 +238,23 @@ function act(s, c, owner = "player") {
     s.speed = c.speed;
     return;
   }
+  if(c.type==='bidProperty') {
+    if(p?.type==='service') {
+      const contract=serviceKind(p)==='bank'?s.companies[owner]?.bank:s.companies[owner]?.logistics;
+      requireThat(!contract||contract.propertyId===p.id||!s.auctions?.[contract.propertyId],'Seu contrato atual está em disputa.');
+    }
+    placeBid(s,c.id,owner,c.amount,(...args)=>ledger(s,...args));
+    report(s,p.id+': novo lance reservado por '+s.companies[owner].name+'.');return;
+  }
   if (c.type === "buyProperty") {
     requireThat(
-      ["sale", "farm", "factory"].includes(p?.type) && (p.owner === "neutral" || finalPurchaseAllowed(s,p.id,owner)),
+      ["sale", "farm", "factory"].includes(p?.type) && p.owner === "neutral" && !s.auctions?.[p.id],
       "Apenas propriedades neutras podem ser compradas.",
     );
     spend(
       s,
       owner,
-      (rules.propertyPrices[p.type] ?? rules.propertyPrice) *
-        (p.type === "sale" ? 1 : p.level),
+      propertyPurchasePrice(p),
       "Compra de propriedade",
       p.id,
     );
@@ -229,7 +262,55 @@ function act(s, c, owner = "player") {
     if (p.securityId) s.properties[p.securityId].owner = owner;
     return;
   }
+  if(c.type==='hireBank' || c.type==='cancelBank') {
+    const slot=ruralMap.slots.find(slot=>slot.id===c.id);
+    requireThat(p?.type==='service' && slot?.service==='bank','Selecione um banco.');
+    const company=s.companies[owner];
+    requireThat(!s.auctions?.[p.id] && !s.auctions?.[company.bank?.propertyId],'Contrato em leilão: aguarde o encerramento.');
+    requireThat(['public','neutral',owner].includes(p.owner),'Serviço de outra empresa: faça um lance.');
+    if(c.type==='cancelBank') {
+      requireThat(company.bank,'Não há serviço bancário contratado.');
+      settleBankFees(s,owner,(...args)=>ledger(s,...args));
+      payBankDebt(s,owner,(...args)=>ledger(s,...args));
+      if(company.bank && s.properties[company.bank.propertyId]) s.properties[company.bank.propertyId].owner='public';
+      company.bank=null;
+      report(s,'Serviço bancário cancelado. Novas coletas serão manuais.');
+    } else {
+      const plan=bankPlan(p.level);
+      requireThat(plan,'Plano bancário inválido.');
+      requireThat(company.bank?.level!==p.level,'Este serviço bancário já está ativo.');
+      const previousDebt=bankPlan(company.bank?.level) ? Math.round(Math.max(0,company.dailyFinance.revenue-company.dailyFinance.expenses+company.dailyFinance.bankFees-company.dailyFinance.taxedProfit)*bankPlan(company.bank.level).rate) : 0;
+      requireThat(company.cash>=plan.hire+previousDebt+company.bankDebt,'Caixa insuficiente para contratar e quitar taxas pendentes.');
+      settleBankFees(s,owner,(...args)=>ledger(s,...args));
+      payBankDebt(s,owner,(...args)=>ledger(s,...args));
+      spend(s,owner,plan.hire,'Contratação de serviço bancário',p.id);
+      if(company.bank && company.bank.propertyId!==p.id)s.properties[company.bank.propertyId].owner='public';
+      p.owner=owner;
+      company.bank={level:p.level,propertyId:p.id,startedAt:s.time};
+      report(s,'Serviço bancário nível '+p.level+' contratado. Contrato anterior substituído.');
+    }
+    return;
+  }
+  if(c.type==='hireLogistics' || c.type==='cancelLogistics') {
+    const slot=ruralMap.slots.find(slot=>slot.id===c.id);
+    requireThat(p?.type==='service' && slot?.service==='logistics','Selecione a transportadora.');
+    const company=s.companies[owner];
+    requireThat(!s.auctions?.[p.id],'Contrato em leilão: aguarde o encerramento.');
+    requireThat(['public','neutral',owner].includes(p.owner),'Serviço de outra empresa: faça um lance.');
+    if(c.type==='hireLogistics') {
+      requireThat(!company.logistics,'Transportadora já contratada.');
+      spend(s,owner,rules.logistics.hire,'Contratação da transportadora',p.id);
+      p.owner=owner;
+      company.logistics={propertyId:p.id,startedAt:s.time,nextFeeAt:s.time+DAY,suspended:false,milkMoved:0,cheeseMoved:0};
+      report(s,'Transportadora contratada: fazenda → fábrica → loja automaticamente.');
+    } else {
+      requireThat(company.logistics,'Não há transportadora contratada.');
+      company.logistics=null;p.owner='public';report(s,'Serviço da transportadora cancelado.');
+    }
+    return;
+  }
   own(s, c.id, owner);
+  if(['buyCow','sellCow','moveCow','hireWorker'].includes(c.type)) requireThat(!s.auctions?.[p.id] && !s.auctions?.[c.target],'Não altere vacas ou funcionários enquanto a propriedade estiver em leilão.');
   switch (c.type) {
     case "buyFeed":
       requireThat(p.type === "farm", "Selecione uma fazenda.");
@@ -250,7 +331,30 @@ function act(s, c, owner = "player") {
         "Fazenda sem vagas.",
       );
       spend(s, owner, rules.cows[c.species].price, "Compra de vaca", p.id);
+      p.cowAges ??= Object.fromEntries(Object.entries(p.cows).map(([k,n]) => [k, Array(n).fill(0)]));
+      (p.cowAges[c.species] ??= []).push(s.time);
       p.cows[c.species] = (p.cows[c.species] ?? 0) + 1;
+      break;
+    }
+    case "moveCow":
+    case "sellCow": {
+      requireThat(p.type === 'farm' && rules.cows[c.species], 'Selecione uma espécie válida.');
+      requireThat(Number.isInteger(c.quantity) && c.quantity > 0 && c.quantity <= (p.cows[c.species] ?? 0), 'Quantidade de vacas inválida.');
+      p.cowAges ??= Object.fromEntries(Object.entries(p.cows).map(([k,n]) => [k, Array(n).fill(0)]));
+      const ages = [...(p.cowAges[c.species] ?? [])].sort((a,b)=>a-b);
+      if(c.type === 'sellCow') {
+        requireThat(ages.filter(t => s.time-t >= rules.cowResaleDelay).length >= c.quantity, 'Aguarde 3 dias de jogo após a compra para vender.');
+        ledger(s, owner, Math.round(rules.cows[c.species].price * rules.cowResaleRatio) * c.quantity, 'Venda de vacas', p.id);
+      } else {
+        const dest = own(s,c.target,owner);
+        requireThat(dest.type === 'farm' && dest.id !== p.id, 'Selecione outra fazenda.');
+        requireThat(total(dest.cows)+c.quantity <= rules.farmCapacities[dest.level-1], 'Fazenda de destino sem vagas.');
+        dest.cowAges ??= Object.fromEntries(Object.entries(dest.cows).map(([k,n]) => [k, Array(n).fill(0)]));
+        (dest.cowAges[c.species] ??= []).push(...ages.slice(0,c.quantity));
+        dest.cows[c.species] = (dest.cows[c.species] ?? 0)+c.quantity;
+      }
+      p.cows[c.species] -= c.quantity;
+      p.cowAges[c.species] = ages.slice(c.quantity);
       break;
     }
     case "collectMilk": {
@@ -258,9 +362,19 @@ function act(s, c, owner = "player") {
       const f = own(s, c.target, owner);
       requireThat(f.type === "factory", "Destino deve ser uma fábrica.");
       requireThat(
-        transfer(p.milk, f.milk, rules.factoryMilkCapacity) > 0,
+        transfer(p.milk, f.milk, Math.floor(rules.factoryMilkCapacity-total(f.milkProgress ?? {}))) > 0,
         "Sem leite disponível ou fábrica cheia.",
       );
+      // Conserve o progresso anterior sem expor ou transferir frações como estoque pronto.
+      f.milkProgress ??= {};
+      for(const [k,n] of Object.entries(p.milkProgress ?? {})) {
+        const pending=Math.min(n,Math.max(0,rules.factoryMilkCapacity-total(f.milk)-total(f.milkProgress)));
+        f.milkProgress[k]=(f.milkProgress[k] ?? 0)+pending;
+        p.milkProgress[k]-=pending;
+        const completed=Math.floor(f.milkProgress[k]+1e-9);
+        f.milk[k]=(f.milk[k] ?? 0)+completed;
+        f.milkProgress[k]=Math.max(0,f.milkProgress[k]-completed);
+      }
       break;
     }
     case "buyPackaging":
@@ -275,9 +389,12 @@ function act(s, c, owner = "player") {
     case "produce": {
       const r = rules.recipes[c.recipe];
       requireThat(p.type === "factory" && r, "Receita inválida.");
+      requireThat(r.quality, "Receita antiga disponível apenas para lotes já iniciados.");
+      requireThat(dairy[c.quality], "Tipo de leite inválido.");
+      requireThat(!r.quality || r.quality === c.quality, "Este queijo exige o leite da mesma origem.");
       requireThat(
         p.batches.filter((b) => b.phase === "production").length <
-          rules.factoryLines[p.level - 1],
+          factoryProfile(p).lines,
         "Linha ocupada.",
       );
       requireThat(
@@ -323,6 +440,32 @@ function act(s, c, owner = "player") {
       ledger(s, owner, p.till, "Coleta da loja", p.id);
       p.till = 0;
       break;
+    case 'hireWorker': {
+      const tier=rules.workerTiers[c.level];
+      requireThat(p.type==='factory' && Number.isInteger(c.level) && tier,'Selecione uma fábrica e nível válido.');
+      requireThat((p.workers ?? []).length<workerCapacity(p),'Fábrica sem vagas para funcionários.');
+      spend(s,owner,tier.hire,'Contratação de funcionário',p.id);
+      (p.workers ??= []).push({id:'worker-'+s.nextId++,level:c.level,missedWages:0,nextWageAt:s.time+DAY});
+      break;
+    }
+    case 'payWorkerWages': {
+      requireThat(p.type==='factory','Selecione uma fábrica.');
+      const owed=(p.workers ?? []).reduce((n,w)=>n+w.missedWages*rules.workerTiers[w.level].salary,0);
+      requireThat(owed>0,'Sem salários em atraso.');
+      spend(s,owner,owed,'Salários atrasados de funcionários',p.id);
+      p.workers.forEach(w=>w.missedWages=0);
+      break;
+    }
+    case 'payTeamWages': {
+      requireThat(p.type==='security' && p.team?.missedWages>0,'Sem salários de capangas em atraso.');
+      spend(s,owner,p.team.missedWages*rules.teamSalaries[p.team.stars-1],'Salários atrasados de capangas',p.id);
+      p.team.missedWages=0;p.team.moral=Math.min(1,p.team.moral+.25);
+      break;
+    }
+    case 'dismissStaffNotices':
+      requireThat(['factory','security'].includes(p.type),'Estabelecimento sem avisos de pessoal.');
+      p.staffNotices=[];
+      break;
     case "hireSeller":
       requireThat(p.type === "sale" && !p.seller, "Loja já possui vendedor.");
       spend(s, owner, rules.sellerHire, "Contratação de vendedor", p.id);
@@ -333,7 +476,7 @@ function act(s, c, owner = "player") {
       requireThat(p.type === "security" && !p.team, "Posto já possui equipe.");
       const tier = c.level ?? 1;
       requireThat([1,2,3].includes(tier), "Nível de equipe inválido.");
-      spend(s, owner, rules.teamHire + rules.starUpgrade.slice(1,tier).reduce((n,v)=>n+v,0), "Contratação de capangas", p.id);
+      spend(s, owner, rules.teamHirePrices[tier-1], "Contratação de capangas", p.id);
       p.team = team(s, owner);
       p.team.stars = tier;
       break;
@@ -391,7 +534,7 @@ function act(s, c, owner = "player") {
         p.team.busyUntil <= s.time && p.team.recoverUntil <= s.time,
         "Equipe indisponível.",
       );
-      spend(s, owner, rules.weaponUpgrade, "Armamento", p.id);
+      spend(s, owner, rules.weaponUpgrade[p.team.weapon], "Armamento", p.id);
       p.team.weapon++;
       break;
     case "upgradeBarricade":
@@ -399,7 +542,7 @@ function act(s, c, owner = "player") {
         p.type === "security" && p.barricade < 3,
         "Barricada máxima.",
       );
-      spend(s, owner, rules.barricadeUpgrade, "Barricadas", p.id);
+      spend(s, owner, rules.barricadeUpgrade[p.barricade], "Barricadas", p.id);
       p.barricade++;
       break;
     case "attack": {
@@ -419,7 +562,7 @@ function act(s, c, owner = "player") {
         p.team.cooldownUntil <= s.time && attackStrength(p.team, s.time) > 0,
         "Equipe ocupada, em recuperação ou cooldown.",
       );
-      requireThat(distance(p.id, d.id) <= rules.range, "Alvo fora de alcance.");
+      requireThat(roadConnected(p.id, d.id), "Alvo sem rua direta entre as lojas.");
       requireThat(
         !s.missions.some((m) => m.to === d.id),
         "Alvo já está sob ataque.",
@@ -461,6 +604,20 @@ function report(s, text) {
   s.reports.unshift({ time: s.time, text });
   s.reports = s.reports.slice(0, 100);
 }
+function settleRetaliation(s) {
+  for(const [owner,company] of Object.entries(s.companies)) {
+    company.retaliationDebts=(company.retaliationDebts ?? []).filter(debt=>{
+      if(!s.companies[debt.to]) return true;
+      const paid=Math.min(company.cash,debt.amount);
+      if(paid>0) {
+        spend(s,owner,paid,"Retaliação: defesa vencedora",debt.property);
+        ledger(s,debt.to,paid,"Prêmio por defesa vencedora",debt.property,paid,0);
+        debt.amount-=paid;
+      }
+      return debt.amount>0;
+    });
+  }
+}
 function resolve(s, m, offline, rng) {
   const from = s.properties[m.from],
     to = s.properties[m.to],
@@ -500,6 +657,13 @@ function resolve(s, m, offline, rng) {
       `${s.companies[m.owner].name} venceu (${probability.toFixed(1)}%). ${s.properties[to.saleId].id}: ${newOwner === "neutral" ? "ponto neutro" : "ocupação inimiga"}.`,
     );
   } else {
+    if(s.companies[m.owner] && s.companies[to.owner]) {
+      const level=to.team?.stars ?? 1;
+      const amount=rules.retaliationByLevel[level-1];
+      (s.companies[m.owner].retaliationDebts ??= []).push({to:to.owner,amount,property:to.id});
+      settleRetaliation(s);
+      report(s,`Defesa nível ${level} venceu: ${s.companies[m.owner].name} deve pagar R$ ${amount/100} ao defensor. Saldo não pago permanece pendente.`);
+    }
     t.recoverUntil = s.time + rules.recovery;
     report(
       s,
@@ -515,10 +679,40 @@ function salary(s, p, cost, kind) {
   report(s, `${p.id}: salário não pago.`);
   return false;
 }
+function transferAuctionProperty(s,p,owner){
+  if(p.type==='service'){
+    const kind=serviceKind(p),old=p.owner;
+    if(kind==='bank'){
+      if(s.companies[old]?.bank?.propertyId===p.id){settleBankFees(s,old,(...args)=>ledger(s,...args));payBankDebt(s,old,(...args)=>ledger(s,...args));s.companies[old].bank=null;}
+      const c=s.companies[owner];
+      if(c.bank){settleBankFees(s,owner,(...args)=>ledger(s,...args));payBankDebt(s,owner,(...args)=>ledger(s,...args));if(c.bank.propertyId!==p.id)s.properties[c.bank.propertyId].owner='public';}
+      c.bank={level:p.level,propertyId:p.id,startedAt:s.time};
+    }else{
+      if(s.companies[old]?.logistics?.propertyId===p.id)s.companies[old].logistics=null;
+      s.companies[owner].logistics={propertyId:p.id,startedAt:s.time,nextFeeAt:s.time+DAY,suspended:false,milkMoved:0,cheeseMoved:0};
+    }
+  }
+  p.owner=owner;
+}
 function tick(s, dt, offline, rng) {
   if(s.campaign?.outcome) return;
   const previous = s.time;
-  s.time += dt;
+  if(Math.floor((previous+dt)/DAY)>Math.floor(previous/DAY)) {
+    // As vendas finais pertencem ao dia encerrado, antes da apuração bancária.
+    s.time=Math.floor((previous+dt)/DAY)*DAY-1;
+    for(const shop of Object.values(s.properties)) {
+      if(shop.type!=="sale" || !shop.sellerActive || !s.companies[shop.owner]) continue;
+      for(const [key,quantity] of Object.entries(shop.stock)) {
+        if(quantity<=0) continue;
+        const price=rules.recipes[key.split(":")[0]].price;
+        shop.stock[key]=0;shop.sales+=quantity;shop.till+=quantity*price;
+        ledger(s,shop.owner,0,"Venda ao consumidor",shop.id,quantity*price,0);
+      }
+      shop.saleProgress=0;
+    }
+  }
+  s.time = previous+dt;
+  closeBankDays(s,(...args)=>ledger(s,...args));
   for (const p of Object.values(s.properties)) {
     if (p.type === "farm" && s.companies[p.owner]) {
       const need = Object.entries(p.cows).reduce(
@@ -529,18 +723,30 @@ function tick(s, dt, offline, rng) {
         (n, [k, count]) => n + (count * rules.cows[k].milk * dt) / DAY,
         0,
       );
-      const factor = Math.min(
-        1,
-        need ? Math.max(0, p.feed) / need : 0,
-        liters ? Math.max(0, rules.milkCapacity - total(p.milk)) / liters : 0,
-      );
-      p.feed = Math.max(0, p.feed - need * factor);
-      for (const [k, count] of Object.entries(p.cows))
-        p.milk[k] =
-          (p.milk[k] ?? 0) + ((count * rules.cows[k].milk * dt) / DAY) * factor;
+      const fed = need ? Math.min(1, Math.max(0,p.feed)/need) : 0;
+      const efficiency = rules.unfedProduction + (1-rules.unfedProduction)*fed;
+      const progress = (p.milkProgress ??= {});
+      const room = Math.max(0,rules.milkCapacity-total(p.milk));
+      const capacity = liters ? Math.min(1,room/(liters*efficiency)) : 0;
+      p.feed = Math.max(0,p.feed-need*fed*capacity);
+      if(p.feed<1e-9) p.feed=0;
+      for(const [k,count] of Object.entries(p.cows)) {
+        progress[k]=(progress[k] ?? 0)+(count*rules.cows[k].milk*dt/DAY)*efficiency*capacity;
+        const completed = Math.min(Math.floor(progress[k]+1e-9),rules.milkCapacity-total(p.milk));
+        if(completed>0) {
+          progress[k]=Math.max(0,progress[k]-completed);
+          p.milk[k]=(p.milk[k] ?? 0)+completed;
+          const known=(s.companies[p.owner].discoveredMilk ??= []);
+          if(!known.includes(k)) known.push(k);
+        }
+      }
     }
-    if (p.type === "factory")
-      for (const b of [...p.batches])
+    if (p.type === 'factory') {
+      if(s.companies[p.owner]) processWorkerPayroll(s,p,
+        cost=>spend(s,p.owner,cost,'Salário de funcionário',p.id),text=>report(s,p.id+': '+text));
+      const bonus=productionMultiplier(p)-1;
+      for (const b of [...p.batches]) {
+        if(b.phase==='production') b.due-=dt*bonus;
         if (b.due <= s.time) {
           const r = rules.recipes[b.recipe];
           if (b.phase === "production" && r.maturity) {
@@ -552,6 +758,19 @@ function tick(s, dt, offline, rng) {
             p.batches = p.batches.filter((v) => v !== b);
           }
         }
+      }
+      if(activeWorkers(p).length && s.companies[p.owner]) {
+        while(p.batches.filter(b=>b.phase==='production').length<factoryProfile(p).lines && total(p.ready)+p.batches.length<rules.cheeseCapacity) {
+          const entry=Object.entries(rules.recipes).find(([,r])=>r.quality && (p.milk[r.quality] ?? 0)>=r.milk);
+          if(!entry) break;
+          if(p.packaging<1) {
+            if(s.companies[p.owner].cash<rules.packagingPrice) break;
+            act(s,{type:'buyPackaging',id:p.id,quantity:1},p.owner);
+          }
+          act(s,{type:'produce',id:p.id,recipe:entry[0],quality:entry[1].quality},p.owner);
+        }
+      }
+    }
     if (p.type === "sale" && s.companies[p.owner] && p.sellerActive) {
       const key = Object.keys(p.stock).find((k) => p.stock[k] > 0);
       if (
@@ -576,7 +795,19 @@ function tick(s, dt, offline, rng) {
   }
   if (Math.floor(s.time / DAY) > Math.floor(previous / DAY)) {
     for (const p of Object.values(s.properties)) {
+      if(p.type==='factory' && s.companies[p.owner] && factoryProfile(p).daily>0) {
+        p.maintenanceDebt=(p.maintenanceDebt ?? 0)+factoryProfile(p).daily;
+        const paid=Math.min(s.companies[p.owner].cash,p.maintenanceDebt);
+        if(paid>0){spend(s,p.owner,paid,"Manutenção de queijaria",p.id);p.maintenanceDebt-=paid;}
+        if(p.maintenanceDebt>0)report(s,p.id+": manutenção da queijaria pendente.");
+      }
       if (p.type === "sale") {
+        if(s.companies[p.owner]) {
+          p.maintenanceDebt=(p.maintenanceDebt ?? 0)+rules.shopDailyMaintenance;
+          const paid=Math.min(s.companies[p.owner].cash,p.maintenanceDebt);
+          if(paid>0) {spend(s,p.owner,paid,"Manutenção de loja",p.id);p.maintenanceDebt-=paid;}
+          if(p.maintenanceDebt>0) report(s,p.id+": manutenção da loja pendente.");
+        }
         p.demandRemaining = rules.sellerDaily;
         if (p.seller && s.companies[p.owner])
           p.sellerActive = salary(
@@ -587,15 +818,16 @@ function tick(s, dt, offline, rng) {
           );
       }
       if (p.type === "security" && p.team && s.companies[p.owner]) {
-        if (salary(s, p, rules.teamSalary, "Salário de capangas")) {
+        if (salary(s, p, rules.teamSalaries[p.team.stars-1]*(p.team.missedWages+1), "Salário de capangas")) {
           p.team.missedWages = 0;
           p.team.moral = Math.min(1, p.team.moral + 0.25);
         } else {
           p.team.missedWages++;
           p.team.moral = Math.max(0, p.team.moral - 0.5);
-          if (p.team.missedWages >= 3) {
+          if (p.team.missedWages >= rules.unpaidDaysBeforeDeparture) {
+            (p.staffNotices ??= []).push({id:p.team.id,time:s.time,text:"Capangas pediram demissão após 4 dias sem salário."});
             p.team = null;
-            report(s, `${p.id}: equipe abandonou o posto.`);
+            report(s, `${p.id}: capangas pediram demissão após 4 dias sem salário.`);
           }
         }
       }
@@ -606,7 +838,7 @@ function tick(s, dt, offline, rng) {
           salary(
             s,
             { owner, id: t.id },
-            rules.teamSalary,
+            rules.teamSalaries[t.stars-1]*(t.missedWages+1),
             "Salário de capangas em reserva",
           )
         ) {
@@ -616,10 +848,16 @@ function tick(s, dt, offline, rng) {
           t.missedWages++;
           t.moral = Math.max(0, t.moral - 0.5);
         }
-        return t.missedWages < 3;
+        if(t.missedWages>=rules.unpaidDaysBeforeDeparture) report(s,t.id+": capangas em reserva pediram demissão após 4 dias sem salário.");
+        return t.missedWages < rules.unpaidDaysBeforeDeparture;
       });
     }
   }
+  processLogistics(s,(c,owner)=>act(s,c,owner),(...args)=>ledger(s,...args));
+  processBankServices(s,(...args)=>ledger(s,...args));
+  settleRetaliation(s);
+  finishAuctions(s,(...args)=>ledger(s,...args),(p,owner)=>transferAuctionProperty(s,p,owner),text=>report(s,text));
+  updateCampaign(s);
   const due = s.missions.filter((m) => m.due <= s.time);
   s.missions = s.missions.filter((m) => m.due > s.time);
   for (const m of due) resolve(s, m, offline, rng);
@@ -648,19 +886,20 @@ function ai(s, offline) {
       (p) => p.type === "sale" && p.owner === owner,
     );
   if (farm && factory) {
-    if (farm.feed < 3) safe({ type: "buyFeed", id: farm.id, quantity: 3 });
+    const dailyFeed=Object.entries(farm.cows).reduce((n,[k,count])=>n+rules.cows[k].feed*count,0);
+    if (farm.feed < dailyFeed) safe({ type: "buyFeed", id: farm.id, quantity: Math.max(1,Math.ceil(dailyFeed)) });
     if (total(farm.milk) > 0)
       safe({ type: "collectMilk", id: farm.id, target: factory.id });
     if (factory.packaging < 1)
       safe({ type: "buyPackaging", id: factory.id, quantity: 5 });
     if (
-      factory.milk.weak >= 5 &&
+      factory.milk.weak >= rules.recipes.weak.milk &&
       !factory.batches.some((b) => b.phase === "production")
     )
       safe({
         type: "produce",
         id: factory.id,
-        recipe: "frescal",
+        recipe: "weak",
         quality: "weak",
       });
     if (shop) {
@@ -670,17 +909,18 @@ function ai(s, offline) {
       if (shop.till > 0) safe({ type: "collectCash", id: shop.id });
     }
   }
-  if (offline || s.time < rules.aiAggressionAfter) return;
-  if(finalPurchaseAllowed(s,'farm-ze',owner)) {
-    safe({type:'buyProperty',id:'farm-ze'});
-    if(s.campaign?.outcome) return;
-  }
+  if(offline) return;
+  const homePost=Object.values(s.properties).find(p=>p.type==='security'&&p.owner===owner&&!p.team);
+  if(homePost && s.companies[owner].cash>=rules.teamHirePrices[0]+10000) safe({type:'hireTeam',id:homePost.id,level:1});
+  if(s.time < rules.aiAggressionAfter) return;
+  const bid=auctionDecision(s,owner);
+  if(bid) safe(bid);
   // Neutral territory is acquired with real money, never by an attack.
   const purchase = Object.values(s.properties).find(p =>
     p.type === "sale" && p.owner === "neutral" &&
     s.companies[owner].cash >= rules.propertyPrice &&
     Object.values(s.properties).some(home => home.type === "security" && home.owner === owner &&
-      distance(home.id,p.securityId) <= rules.range));
+      roadConnected(home.id,p.securityId)));
   if (purchase) safe({type:"buyProperty",id:purchase.id});
   for (const post of Object.values(s.properties).filter(
     (p) => p.type === "security" && p.owner === owner,
@@ -702,7 +942,7 @@ function ai(s, offline) {
           p.type === "security" &&
           p.owner !== owner &&
           p.owner !== "neutral" &&
-          distance(post.id, p.id) <= rules.range &&
+          roadConnected(post.id, p.id) &&
           !s.missions.some((m) => m.to === p.id),
       )
       .sort((a, b) => distance(post.id, a.id) - distance(post.id, b.id));
@@ -738,6 +978,7 @@ export function migrateSave(saved) {
     "Salvamento incompatível com esta versão de regras.",
   );
   const s = structuredClone(saved);
+  migrateClock(s);
   if ((s.layoutVersion ?? 1) < 2) {
     const defaults = createGame(s.savedAt);
     for (const slot of ruralMap.slots) {
@@ -779,6 +1020,32 @@ export function migrateSave(saved) {
     }
     s.layoutVersion = 3;
   }
+  s.auctions ??= {};
+  for(const company of Object.values(s.companies)){
+    if(company.bank && s.properties[company.bank.propertyId]?.owner==='public')s.properties[company.bank.propertyId].owner=Object.keys(s.companies).find(id=>s.companies[id]===company);
+    if(company.logistics && s.properties[company.logistics.propertyId]?.owner==='public')s.properties[company.logistics.propertyId].owner=Object.keys(s.companies).find(id=>s.companies[id]===company);
+  }
+  for(const p of Object.values(s.properties)) if(p.type === "farm" && !p.cowAges)
+    p.cowAges=Object.fromEntries(Object.entries(p.cows).map(([k,n])=>[k,Array(n).fill(s.time)]));
+  for(const p of Object.values(s.properties)) if(p.milk) {
+    p.milkProgress ??= {};
+    for(const [k,n] of Object.entries(p.milk)) if(n%1) {
+      p.milkProgress[k]=(p.milkProgress[k] ?? 0)+(n-Math.floor(n));
+      p.milk[k]=Math.floor(n);
+    }
+  }
+  for(const p of Object.values(s.properties)) {
+    const slot=ruralMap.slots.find(slot=>slot.id===p.id);
+    if(slot?.service==='bank') p.level=slot.level;
+    if(p.type==='factory') {p.workers ??= [];p.staffNotices ??= [];}
+    if(p.type==='security') p.staffNotices ??= [];
+  }
+  for(const owner of Object.keys(s.companies)) {
+    s.companies[owner].bank ??= null;
+    s.companies[owner].logistics ??= null;
+    ensureBankState(s,owner);
+    s.companies[owner].discoveredMilk=discoveredMilk(s,owner);
+  }
   return s;
 }
 export function validateSave(s) {
@@ -809,6 +1076,10 @@ export function validateSave(s) {
         ["player", "coalho", "neutral", "public"].includes(p.owner),
       "Propriedade inválida.",
     );
+    if(p.type==='factory') {
+      requireThat(Array.isArray(p.workers ?? []) && (p.workers ?? []).length<=workerCapacity(p),'Funcionários inválidos.');
+      for(const w of p.workers ?? []) requireThat(rules.workerTiers[w.level] && Number.isInteger(w.missedWages) && w.missedWages>=0 && w.missedWages<rules.unpaidDaysBeforeDeparture && Number.isFinite(w.nextWageAt),'Funcionário inválido.');
+    }
     if (p.type === "sale")
       requireThat(
         s.properties[p.securityId]?.owner === p.owner,
@@ -821,7 +1092,11 @@ export function validateSave(s) {
           "Estoque inválido.",
         );
   }
-  for (const c of Object.values(s.companies))
+  requireThat(validateAuctions(s),'Leilão inválido.');
+  for (const c of Object.values(s.companies)) {
     requireThat(Number.isFinite(c.cash) && c.cash >= 0, "Caixa inválido.");
+    requireThat(validateBankContract(c),"Contrato bancário inválido.");
+    requireThat(validateLogistics(c),"Contrato de transportadora inválido.");
+  }
   return s;
 }

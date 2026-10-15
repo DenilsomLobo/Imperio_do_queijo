@@ -1,6 +1,6 @@
 # Zona rural: cidadezinha e plantações — 14/10/2026
 
-Pedido final: apenas um banco de nível 2. Usados os PNGs originais dos edifícios, sem gerar substitutos. Fundo novo `assets/rural-village-v2.png`; geração pela ferramenta integrada image_gen. Fundo anterior preservado. Inventário: 49 PNGs.
+Pedido final: apenas um banco de nível 2. Usados os PNGs originais dos edifícios, sem gerar substitutos. Fundo novo `assets/mapas/rural-village-v2.png`; geração pela ferramenta integrada image_gen. Fundo anterior preservado. Inventário: 49 PNGs.
 
 | Distrito | Edifícios | Lojas e bandeiras |
 |---|---|---|

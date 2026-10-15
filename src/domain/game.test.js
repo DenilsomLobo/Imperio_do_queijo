@@ -14,12 +14,12 @@ import { rules, DAY } from "../data/game-rules.js";
 
 const cmd = (s, type, id, extra = {}) => command(s, { type, id, ...extra });
 describe("mapa fixo", () => {
-  it("possui 14 lojas com 14 controles: 1 aliada, 8 neutras, 5 inimigas ao norte e fazenda ao sul", () => {
+  it("possui 14 lojas com 14 controles: 1 aliada, 12 neutras, 1 inimiga ao norte e fazenda ao sul", () => {
     const sales = ruralMap.slots.filter((p) => p.type === "sale");
     expect(sales).toHaveLength(14);
     expect(sales.filter((p) => p.owner === "player")).toHaveLength(1);
-    expect(sales.filter((p) => p.owner === "neutral")).toHaveLength(8);
-    expect(sales.filter((p) => p.owner === "coalho")).toHaveLength(5);
+    expect(sales.filter((p) => p.owner === "neutral")).toHaveLength(12);
+    expect(sales.filter((p) => p.owner === "coalho")).toHaveLength(1);
     for (const sale of sales)
       expect(ruralMap.slots.find((p) => p.id === sale.securityId)?.saleId).toBe(
         sale.id,
@@ -35,7 +35,7 @@ describe("mapa fixo", () => {
     const before = JSON.stringify(ruralMap);
     let s = createGame();
     s = cmd(s, "buyProperty", "sale-n1");
-    s = cmd(s, "produce", "factory-ze", { recipe: "frescal", quality: "weak" });
+    s = cmd(s, "produce", "factory-ze", { recipe: "weak", quality: "weak" });
     s = advance(s, 120000);
     expect(JSON.stringify(ruralMap)).toBe(before);
   });
@@ -44,20 +44,20 @@ describe("cadeia econômica integrada", () => {
   it("compra vaca, produz consumindo ração, transfere, fabrica, vende, coleta, paga e recarrega", () => {
     let s = createGame(1);
     s = cmd(s, "buyCow", "farm-ze", { species: "weak" });
-    s = cmd(s, "buyFeed", "farm-ze", { quantity: 10 });
+    s = cmd(s, "buyFeed", "farm-ze", { quantity: 20 });
     s = advance(s, DAY);
-    expect(s.properties["farm-ze"].milk.weak).toBeCloseTo(16);
-    expect(s.properties["farm-ze"].feed).toBeCloseTo(4);
+    expect(s.properties["farm-ze"].milk.weak).toBeCloseTo(2);
+    expect(s.properties["farm-ze"].feed).toBeCloseTo(0);
     s = cmd(s, "collectMilk", "farm-ze", { target: "factory-ze" });
     expect(s.properties["farm-ze"].milk.weak).toBe(0);
-    expect(s.properties["factory-ze"].milk.weak).toBeCloseTo(26);
-    s = cmd(s, "produce", "factory-ze", { recipe: "frescal", quality: "weak" });
-    expect(s.properties["factory-ze"].milk.weak).toBeCloseTo(21);
+    expect(s.properties["factory-ze"].milk.weak).toBeCloseTo(3);
+    s = cmd(s, "produce", "factory-ze", { recipe: "weak", quality: "weak" });
+    expect(s.properties["factory-ze"].milk.weak).toBeCloseTo(2);
     expect(s.properties["factory-ze"].packaging).toBe(9);
-    s = advance(s, 119000);
-    expect(s.properties["factory-ze"].ready["frescal:weak"]).toBe(5);
+    s = advance(s, rules.recipes.weak.time-1000);
+    expect(s.properties["factory-ze"].ready["weak:weak"]).toBe(1);
     s = advance(s, 1000);
-    expect(s.properties["factory-ze"].ready["frescal:weak"]).toBe(6);
+    expect(s.properties["factory-ze"].ready["weak:weak"]).toBe(2);
     s = cmd(s, "collectCheese", "factory-ze", { target: "sale-ze" });
     expect(total(s.properties["factory-ze"].ready)).toBe(0);
     const before = s.companies.player.cash;
@@ -74,9 +74,10 @@ describe("cadeia econômica integrada", () => {
       true,
     );
   });
-  it("falta de ração suspende produção, capacidade limita sem destruir excedente", () => {
+  it("falta de ração reduz produção à metade, capacidade limita sem destruir excedente", () => {
     let s = advance(createGame(), DAY);
     expect(total(s.properties["farm-ze"].milk)).toBe(0);
+    expect(s.properties["farm-ze"].milkProgress.weak).toBeCloseTo(0.5);
     s.properties["farm-ze"].milk.weak = 15;
     s.properties["factory-ze"].milk.weak = 98;
     s = cmd(s, "collectMilk", "farm-ze", { target: "factory-ze" });
@@ -86,7 +87,7 @@ describe("cadeia econômica integrada", () => {
   it("não mistura qualidade e queijo maturando não é coletável", () => {
     let s = createGame();
     s.properties["factory-ze"].ready = {};
-    s = cmd(s, "produce", "factory-ze", { recipe: "meia", quality: "weak" });
+    s.properties["factory-ze"].batches.push({id:s.nextId++,recipe:"meia",quality:"weak",phase:"production",due:s.time+180000});
     s = advance(s, 180000);
     expect(s.properties["factory-ze"].batches[0].phase).toBe("maturation");
     expect(() =>
@@ -97,17 +98,19 @@ describe("cadeia econômica integrada", () => {
   });
   it("caixa, ocupação de linha, vagas e estoque não podem ser contornados", () => {
     let s = createGame();
+    s.companies.player.cash=150000;
     expect(() => cmd(s, "buyCow", "farm-ze", { species: "noble" })).toThrow(
       /Caixa/,
     );
-    s = cmd(s, "produce", "factory-ze", { recipe: "frescal", quality: "weak" });
+    s.properties['factory-ze'].milk={weak:10};
+    for(let i=0;i<5;i++)s = cmd(s, "produce", "factory-ze", { recipe: "weak", quality: "weak" });
     expect(() =>
-      cmd(s, "produce", "factory-ze", { recipe: "frescal", quality: "weak" }),
+      cmd(s, "produce", "factory-ze", { recipe: "weak", quality: "weak" }),
     ).toThrow(/Linha/);
     expect(() =>
-      cmd(s, "produce", "factory-ze", { recipe: "frescal", quality: "common" }),
+      cmd(s, "produce", "factory-ze", { recipe: "weak", quality: "common" }),
     ).toThrow();
-    s.properties["farm-ze"].cows.weak = 5;
+    s.properties["farm-ze"].cows.weak = rules.farmCapacities[0];
     expect(() => cmd(s, "buyCow", "farm-ze", { species: "weak" })).toThrow(
       /vagas/,
     );
@@ -117,7 +120,7 @@ describe("cadeia econômica integrada", () => {
   });
   it("demanda e caixa da loja são finitos e receita não é duplicada na coleta", () => {
     let s = createGame();
-    s.properties["sale-ze"].stock = { "frescal:weak": 40 };
+    s.properties["sale-ze"].stock = { "weak:weak": 40 };
     s = advance(s, DAY - 1000);
     expect(s.properties["sale-ze"].sales).toBe(19);
     s = cmd(s, "collectCash", "sale-ze");
@@ -139,6 +142,11 @@ describe("cadeia econômica integrada", () => {
 });
 function army() {
   let s = createGame();
+  s.companies.player.cash=1000000;
+  s.companies.coalho.cash=1000000;
+  s=command(s,{type:'hireTeam',id:'sale-e1-control'},'coalho');
+  s.properties['sale-e2'].owner=s.properties['sale-e2-control'].owner='coalho';
+  s=command(s,{type:'hireTeam',id:'sale-e2-control'},'coalho');
   s = cmd(s, "buyProperty", "sale-n6");
   s = cmd(s, "hireTeam", "sale-n6-control");
   return s;
@@ -172,7 +180,7 @@ describe("combate e conquista", () => {
         "coalho",
       ),
     ).toThrow(/indisponível/);
-    s = advance(s, rules.recovery);
+    s = advance(s, rules.recovery,{offline:true});
     s = command(
       s,
       { type: "deployReserve", id: "sale-e1-control", teamId: t.id },
@@ -207,7 +215,7 @@ describe("combate e conquista", () => {
     expect(s.properties["sale-e1-control"].owner).toBe("neutral");
     expect(s.properties["sale-e1-control"].barricade).toBe(2);
     s = cmd(s, "collectCheese", "factory-ze", { target: "sale-ze" });
-    s = advance(s, 900000);
+    s = advance(s, 5 * DAY / rules.sellerDaily);
     s = cmd(s, "collectCash", "sale-ze");
     s = cmd(s, "buyProperty", "sale-e1");
     expect(s.properties["sale-e1-control"].owner).toBe("player");
@@ -232,7 +240,7 @@ describe("combate e conquista", () => {
       s.properties["sale-n6-control"].team.recoverUntil,
     ).toBeLessThanOrEqual(s.time);
   });
-  it("offline limita oito dias e mantém ataques pendentes sem perda territorial", () => {
+  it("offline limita oito horas reais e mantém ataques pendentes sem perda territorial", () => {
     let s = army();
     s = cmd(s, "attack", "sale-n6-control", { target: "sale-e1-control" });
     s = advance(s, rules.attackDuration, { offline: true });
@@ -240,7 +248,7 @@ describe("combate e conquista", () => {
     expect(s.properties["sale-e1"].owner).toBe("coalho");
     s = resolvePending(s, { rng: () => 0 });
     expect(s.properties["sale-e1"].owner).toBe("neutral");
-    const capped = advance(createGame(), 20 * DAY, { offline: true });
+    const capped = advance(createGame(), rules.offlineLimit * 2, { offline: true });
     expect(capped.time).toBe(rules.offlineLimit);
   });
   it("IA usa recursos finitos, mesmas regras e expansão com progressão", () => {
@@ -249,6 +257,7 @@ describe("combate e conquista", () => {
     s = advance(s, DAY);
     expect(s.companies.coalho.cash).toBeLessThan(initial);
     expect(s.missions).toHaveLength(0);
+    s.companies.coalho.cash=1000000; // cenário de expansão com capital acumulado
     s = advance(s, DAY + rules.aiInterval + rules.attackDuration, {
       rng: () => 0,
     });

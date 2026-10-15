@@ -1,0 +1,44 @@
+import {chromium} from 'playwright-core';
+import assert from 'node:assert/strict';
+const browser=await chromium.launch({...(process.env.QA_BROWSER?{executablePath:process.env.QA_BROWSER}:{channel:'chrome'}),headless:true});
+try {
+ const context=await browser.newContext({viewport:{width:1366,height:900}});
+ const page=await context.newPage(),errors=[];
+ page.on('pageerror',e=>errors.push(e.message));
+ let now=Date.now();await page.clock.setFixedTime(new Date(now));
+ await page.goto(process.env.QA_URL ?? 'http://127.0.0.1:5173');
+ await page.locator('canvas[data-ready="true"]').waitFor();
+ await page.evaluate(async now=>{
+  const {createGame}=await import('/src/domain/game.js');
+  const {save}=await import('/src/persistence/local.js');
+  const s=createGame(now);s.companies.player.cash=500000;
+  s.properties['farm-ze'].cows={common:1};s.properties['farm-ze'].cowAges={common:[0]};
+  s.properties['farm-ze'].feed=20;await save(s);
+ },now);
+ await page.reload();await page.locator('canvas[data-ready="true"]').waitFor();
+ assert.equal(await page.locator('.milk-stocks img').count(),0);
+ assert.equal(await page.locator('.cow-card img[alt="Vaca Mimosa"]').count(),1);
+ await page.locator('#catalogue').click();
+ assert.equal(await page.locator('.catalogue-grid img[alt="leite comum"]').count(),0);
+ assert.equal(await page.locator('.catalogue-grid img[alt="queijo magico"]').count(),0);
+ await page.locator('[data-close]').click();
+ await page.locator('[data-manage="properties"]').click();await page.locator('[data-property="factory-ze"]').click();
+ assert.deepEqual(await page.locator('#recipe option').allTextContents(),['Queijo Fraco · 1 L · 2 min']);
+ await page.locator('[data-manage="properties"]').click();await page.locator('[data-property="farm-ze"]').click();
+ now+=(await page.evaluate(async()=>(await import("/src/data/game-rules.js")).DAY))-1000;await page.clock.setFixedTime(new Date(now));await page.waitForTimeout(1200);
+ assert.equal(await page.locator('.milk-stocks img').count(),0);
+ now+=1000;await page.clock.setFixedTime(new Date(now));await page.waitForTimeout(1200);
+ assert.equal(await page.locator('.milk-stocks img[alt="Leite Comum"]').count(),1);
+ assert.match(await page.locator('.milk-stocks').innerText(),/1 L/);
+ await page.locator('aside').evaluate(el=>el.scrollTop=0);await page.screenshot({path:'docs/qa-dairy-discovery.png'});
+ await page.locator('[data-action="collectMilk"]').click();
+ await page.locator('[data-manage="properties"]').click();await page.locator('[data-property="factory-ze"]').click();
+ await page.locator('#recipe').selectOption('common');await page.locator('[data-action="produce"]').click();
+ assert.match(await page.locator('#property-stats').innerText(),/Queijo Comum/);
+ assert.equal(await page.locator('#recipe option').count(),2);
+ await page.locator('#save').click();await page.getByText('Jogo salvo.',{exact:true}).waitFor();
+ await page.reload();await page.locator('canvas[data-ready="true"]').waitFor();
+ await page.locator('#catalogue').click();assert.equal(await page.locator('.catalogue-grid img[alt="leite comum"]').count(),1);
+ assert.equal(await page.locator('.catalogue-grid img[alt="leite magico"]').count(),0);
+ assert.deepEqual(errors,[]);console.log('QA descobertas passou: leite oculto até litro completo, rebanho por fazenda, receita 1 L, catálogo e save/reload.');
+} finally {await browser.close();}

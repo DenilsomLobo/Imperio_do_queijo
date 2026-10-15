@@ -77,3 +77,28 @@ Atualização 14/10/2026: 49 PNGs. rural-village-v2.png é o fundo ativo; os 47 
 Revisão posterior: **50 PNGs**, incluindo rural-dirt-road-v1.png (2172×724, transparência) para as ruas. Prompt final e integração em RURAL_MAP_V3.md; nenhuma referência original removida.
 
 Atualização de ícones: **55 PNGs**, com icon_money.png, icon_leite.png, icon_queijo.png, icon_ataque.png e icon_defesa.png fornecidos pelo usuário e integrados à partida. Hashes/dimensões registrados; categoria icon e origem usuário, sem atribuir geração destes arquivos à ferramenta.
+
+## Organização vigente — 14/10/2026
+
+57 PNGs organizados por uso, sem edição dos arquivos.
+
+- construcoes/fazendas: fazendas.
+- construcoes/fabricas: queijarias e fábricas.
+- construcoes/lojas: barraca inicial e pontos aliados, inimigos e neutros.
+- construcoes/servicos: bancos, agências, transportadora e loja de vacas.
+- producao/vacas, producao/leites, producao/queijos: cadeia produtiva.
+- seguranca/bandeiras, seguranca/capangas: controle e equipes.
+- mapas: cenários; mapas/estradas: textura das vias.
+- icones: coleta e combate.
+
+Os nomes dos arquivos são IDs estáveis. src/data/asset-paths.json relaciona cada nome ao caminho relativo nesta pasta. src/data/assets.js resolve as URLs para jogo, editor e preview. docs/assets-inventory.json registra caminho, dimensões e hash para todos os PNGs. Ao acrescentar/mover imagem, atualize os dois manifestos e execute os testes.
+
+Barraquinha inicial: construcoes/lojas/ponto_de_venda_inicial_seu_ze.png. Bandeira inicial: seguranca/bandeiras/bandeira_capanga_aliado.png. Demais lojas do jogador: construcoes/lojas/Ponto_de_venda_aliado.png.
+
+## Funcionários fornecidos — 14/10/2026
+
+Total atual: 60 PNGs. funcionario_nivel_1.png, funcionario_nivel_2.png e funcionario_nivel_3.png movidos sem edição para assets/pessoal/funcionarios; caminhos registrados em asset-paths.json e inventário com dimensões/hash. Usados em mostruário da agência e cartões de funcionários alocados.
+
+## Menu de setores — artes temporárias
+
+Oito SVGs em assets/icones/menu-temporario: properties, employees, milk, cheese, cows, revenue, cash e enemies. Registro de caminhos em src/data/menu-icons.json; hashes em menu-icons-inventory.json. Servem apenas à navegação e serão substituídos quando o usuário fornecer novos ícones. Os 60 PNGs e suas imagens de produto foram preservados.

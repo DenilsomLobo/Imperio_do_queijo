@@ -1,0 +1,31 @@
+import {chromium} from 'playwright-core';
+import assert from 'node:assert/strict';
+const browser=await chromium.launch({...(process.env.QA_BROWSER?{executablePath:process.env.QA_BROWSER}:{channel:'chrome'}),headless:true});
+try {
+ const page=await browser.newPage({viewport:{width:1500,height:1080}}),errors=[];
+ page.on('pageerror',e=>errors.push(e.message));
+ let now=Date.now();await page.clock.setFixedTime(new Date(now));
+ await page.goto(process.env.QA_URL ?? 'http://127.0.0.1:5173');await page.locator('canvas[data-ready="true"]').waitFor();
+ await page.evaluate(async now=>{const {createGame}=await import('/src/domain/game.js');const {save}=await import('/src/persistence/local.js');const s=createGame(now);s.companies.player.cash=200000000;s.properties['sale-ze'].till=12345;await save(s);},now);
+ await page.reload();await page.locator('canvas[data-ready="true"]').waitFor();
+ const bank=async id=>{await page.locator('[data-manage="cash"]').click();await page.locator('[data-property="'+id+'"]').click();};
+ const load=()=>page.evaluate(async()=>{const {load}=await import('/src/persistence/local.js');return load();});
+ await bank('bank-rural');assert.equal(await page.locator('.farm-portrait').evaluate(el=>el.complete&&el.naturalWidth>0),true);
+ assert.match(await page.locator('#panel').innerText(),/200.000,00/);assert.match(await page.locator('#panel').innerText(),/500.000,00/);
+ await page.locator('[data-action="hireBank"]').click();assert.equal(await page.locator('[data-action="hireBank"]').isDisabled(),true);
+ now+=1000;await page.clock.setFixedTime(new Date(now));await page.waitForTimeout(1200);
+ await page.locator('#save').click();await page.getByText('Jogo salvo.',{exact:true}).waitFor();let s=await load();
+ assert.equal(s.properties['sale-ze'].till,0);assert.equal(s.companies.player.cash,180012345);assert.equal(s.companies.player.revenue,0);
+ await page.evaluate(async()=>{const {load,save}=await import('/src/persistence/local.js');const s=await load();s.companies.player.dailyFinance.revenue=50000001;s.properties['sale-ze'].till=5000;await save(s);});
+ await page.reload();await page.locator('canvas[data-ready="true"]').waitFor();await bank('bank-rural');
+ assert.match(await page.locator('#panel .bank-contract').innerText(),/Coletas suspensas/);
+ await page.locator('aside').evaluate(el=>el.scrollTop=0);await page.screenshot({path:'docs/qa-bank-level-1.png'});
+ await bank('bank-city');assert.match(await page.locator('#panel').innerText(),/500.000,00/);assert.match(await page.locator('#panel').innerText(),/2%/);
+ await page.locator('[data-action="hireBank"]').click();now+=1000;await page.clock.setFixedTime(new Date(now));await page.waitForTimeout(1200);
+ await page.locator('#save').click();await page.getByText('Jogo salvo.',{exact:true}).waitFor();s=await load();assert.equal(s.companies.player.bank.level,2);assert.equal(s.properties['sale-ze'].till,0);
+ await page.locator('aside').evaluate(el=>el.scrollTop=0);await page.screenshot({path:'docs/qa-bank-level-2.png'});
+ await page.reload();await page.locator('canvas[data-ready="true"]').waitFor();assert.equal((await load()).companies.player.bank.level,2);
+ await bank('bank-city');await page.locator('[data-action="cancelBank"]').click();await page.locator('#save').click();await page.getByText('Jogo salvo.',{exact:true}).waitFor();assert.equal((await load()).companies.player.bank,null);
+ await page.reload();await page.locator('canvas[data-ready="true"]').waitFor();assert.equal((await load()).companies.player.bank,null);
+ assert.deepEqual(errors,[]);console.log('QA bancos passou: contratação, coleta real, limite diário, troca exclusiva, cancelamento e save/reload.');
+} finally {await browser.close();}

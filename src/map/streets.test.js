@@ -6,11 +6,11 @@ it("quantidades por distrito correspondem ao pedido, com apenas um banco nível 
   const shops = district => buildings.filter(p => p.type === "sale" && p.district === district);
   expect(buildings).toHaveLength(28);
   expect(shops("town")).toHaveLength(5);
-  expect(shops("town").filter(p => p.owner === "coalho")).toHaveLength(2);
+  expect(shops("town").filter(p => p.owner === "coalho")).toHaveLength(0);
   expect(shops("countryside")).toHaveLength(5);
   expect(shops("countryside").filter(p => p.owner === "neutral")).toHaveLength(4);
   expect(shops("north")).toHaveLength(4);
-  expect(shops("north").filter(p => p.owner === "coalho")).toHaveLength(3);
+  expect(shops("north").filter(p => p.owner === "coalho")).toHaveLength(1);
   expect(buildings.filter(p => p.building === "banco_nivel_2.png")).toHaveLength(1);
   expect(buildings.filter(p => p.type === "factory")).toHaveLength(4);
   expect(buildings.filter(p => p.type === "farm")).toHaveLength(4);

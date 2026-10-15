@@ -1,6 +1,6 @@
 import { chromium } from "playwright-core";
 import assert from "node:assert/strict";
-const browser = await chromium.launch({ channel: "chrome", headless: true });
+const browser = await chromium.launch({ ...(process.env.QA_BROWSER ? {executablePath:process.env.QA_BROWSER} : {channel:"chrome"}), headless: true });
 try {
   const context = await browser.newContext({
       viewport: { width: 1900, height: 1080 },
@@ -59,7 +59,8 @@ try {
     await page.locator("[data-close]").click();
   }
   await page.locator("#catalogue").click();
-  assert.equal(await page.locator(".catalogue-grid article").count(), 57);
+  assert.equal(await page.locator(".catalogue-grid article").count(), 52);
+  assert.equal(await page.locator('.catalogue-grid img[alt="leite magico"]').count(),0);
   await page.screenshot({ path: "docs/qa-catalogue.png" });
   await page.locator("[data-close]").click();
   await page.locator('[data-manage="cows"]').click();

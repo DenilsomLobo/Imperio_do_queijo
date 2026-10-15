@@ -3,9 +3,9 @@ import {createGame,migrateSave,validateSave,command} from './game.js';
 it('corrige uma vez controles cinza sem perder recursos nem equipes inimigas',()=>{
  const original=createGame(123); original.layoutVersion=2;
  const sale=original.properties['sale-n1'], post=original.properties['sale-n1-control'];
- sale.owner=post.owner='coalho'; sale.stock={'frescal:weak':7};sale.till=1234;
+ sale.owner=post.owner='coalho'; sale.stock={'weak:weak':7};sale.till=1234;
  sale.seller=sale.sellerActive=true;
- post.team=structuredClone(original.properties['sale-e1-control'].team);
+ post.team={id:'legacy',owner:'coalho',count:3,stars:1,weapon:0,moral:1,busyUntil:0,recoverUntil:0,cooldownUntil:0,missedWages:0};
  post.team.id='migration-team';post.team.busyUntil=99999;
  const migrated=validateSave(migrateSave(original));
  expect(migrated.properties[sale.id].owner).toBe('neutral');

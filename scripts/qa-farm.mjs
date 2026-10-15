@@ -1,0 +1,34 @@
+import {chromium} from 'playwright-core';
+import assert from 'node:assert/strict';
+const browser=await chromium.launch({executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe',headless:true});
+try {
+ const context=await browser.newContext({viewport:{width:1366,height:768}});
+ const page=await context.newPage(), errors=[];
+ page.on('pageerror',e=>errors.push(e.message));
+ await page.goto(process.env.QA_URL ?? 'http://127.0.0.1:5173');
+ await page.locator('canvas[data-ready="true"]').waitFor();
+ assert.equal(await page.locator('.farm-portrait').evaluate(el=>el.complete&&el.naturalWidth>0),true);
+ assert.equal(await page.locator('.milk-stocks img').count(),0);
+ assert.equal(await page.locator('.cow-card img').count(),1);
+ assert.equal(await page.locator('header button#save').count(),1);
+ assert.equal(await page.locator('aside #save').count(),0);
+ await page.locator('#save').click();
+ await page.getByText('Jogo salvo.',{exact:true}).waitFor();
+ await page.locator('#feed-quantity').fill('100');
+ await page.locator('[data-action="buyFeed"]').click();
+ assert.match(await page.locator('#property-stats').innerText(),/Ração: 100/);
+ await page.locator('aside').evaluate(el=>el.scrollTop=0);
+ await page.screenshot({path:'docs/qa-farm-panel.png'});
+ await page.locator('[data-action="cowShop"]').click();
+ assert.match(await page.locator('#title').innerText(),/Loja de vacas/);
+ await page.locator('[data-action="buyAtCowShop"]').click();
+ assert.equal(await page.locator('[data-metric="cows"]').innerText(),'2');
+ await page.locator('[data-manage="properties"]').click();
+ await page.locator('[data-property="farm-ze"]').click();
+ await page.locator('[data-action="sellCow"]').click();
+ assert.match(await page.locator('#status').innerText(),/3 dias/);
+ await page.reload();await page.locator('canvas[data-ready="true"]').waitFor();
+ assert.equal(await page.locator('[data-metric="cows"]').innerText(),'2');
+ assert.deepEqual(errors,[]);
+ console.log('QA fazenda passou: imagens, ração 100, loja, bloqueio de revenda e reload.');
+} finally {await browser.close();}

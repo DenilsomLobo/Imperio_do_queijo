@@ -1,3 +1,4 @@
+import { assets } from "./data/assets.js";
 import Phaser from "phaser";
 import "./style.css";
 import "./theme.css";
@@ -6,14 +7,6 @@ import regions from "./data/regions.json";
 import { createSlot, contains, validateMap } from "./domain/maps.js";
 import { createRuralMap } from "./data/world.js";
 
-const files = import.meta.glob("../assets/*.png", {
-  eager: true,
-  query: "?url",
-  import: "default",
-});
-const assets = Object.fromEntries(
-  Object.entries(files).map(([path, url]) => [path.split("/").pop(), url]),
-);
 const assetIds = Object.keys(assets);
 const maps = Object.fromEntries(
   regions.map((r) => [

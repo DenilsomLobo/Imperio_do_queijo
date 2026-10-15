@@ -1,0 +1,4 @@
+import {chromium} from 'playwright-core';
+import assert from 'node:assert/strict';
+const browser=await chromium.launch({executablePath:process.env.QA_BROWSER,headless:true});
+try{const page=await browser.newPage({viewport:{width:1920,height:1080}}),errors=[];page.on('pageerror',e=>errors.push(e.message));let loaded=false;page.on('response',r=>{if(r.url().includes('comece_flag.png')&&r.ok())loaded=true;});await page.goto(process.env.QA_URL);await page.locator('canvas[data-ready="true"]').waitFor();await page.waitForTimeout(300);assert.ok(loaded);assert.equal(await page.locator('#property-menu').isVisible(),false);await page.screenshot({path:'docs/qa-start-flag.png'});assert.deepEqual(errors,[]);console.log('Placa original carregada e início da campanha visível, sem erros.');}finally{await browser.close();}

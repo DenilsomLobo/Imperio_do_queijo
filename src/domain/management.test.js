@@ -8,11 +8,11 @@ it("gestão calcula estoque incluindo lojas, funcionários e propriedades sem co
   expect(management(s)).toMatchObject({
     properties: 3,
     employees: 1,
-    milk: 10,
-    cheese: 5,
+    milk: 1,
+    cheese: 1,
     cows: 1,
     revenue: 0,
-    cash: 150000,
+    cash: 50000,
     enemies: 1,
   });
   s = command(s, {
@@ -20,7 +20,8 @@ it("gestão calcula estoque incluindo lojas, funcionários e propriedades sem co
     id: "factory-ze",
     target: "sale-ze",
   });
-  expect(management(s).cheese).toBe(5);
+  expect(management(s).cheese).toBe(1);
+  s.companies.player.cash=1000000;
   s = command(s, { type: "buyProperty", id: "sale-n6" });
   s = command(s, { type: "hireTeam", id: "sale-n6-control" });
   expect(management(s)).toMatchObject({

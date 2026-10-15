@@ -93,7 +93,7 @@ Migração layout 1→2 preserva dinheiro, estoque, vacas, controle, equipes, te
 
 Validação: **28 testes passaram em 5 arquivos**; build passou para partida/editor. QA cadeia produtiva/coleta/combate/save/reload no Chrome passou com novas coordenadas; QA gestão passou oito menus, catálogo 48 imagens, compra real na loja de vacas, conservação de estoque e notebook 1366×768 sem scroll externo. Capturas qa-management-map.png/qa-management-laptop.png/qa-catalogue.png examinadas. Mantém aviso de bundle Phaser e assets pesados; otimização pendente.
 
-Arquivos: novo assets/rural-open-v1.png; src/data/rural-layout.json/world.js/regions.json/game-rules.js; src/domain/game.js/management.js/management.test.js/game.test.js; src/ui/management.js; src/main.js/game.css/editor.js; src/map/game-scene.js/presentation.js; src/persistence/local.js; scripts/rebuild-rural-layout.mjs/normalize-asset-inventory.mjs/qa-browser.mjs/qa-management.mjs; package.json; documentos e capturas. Fases globais continuam parciais. Quatro regiões, pessoal/automação completos, bancos/empréstimos/contabilidade, logística/contratos, pesquisa/especiais, campanha/vitória e Firebase/ranking ainda pendentes; trava entre abas também pendente.
+Arquivos: novo assets/mapas/rural-open-v1.png; src/data/rural-layout.json/world.js/regions.json/game-rules.js; src/domain/game.js/management.js/management.test.js/game.test.js; src/ui/management.js; src/main.js/game.css/editor.js; src/map/game-scene.js/presentation.js; src/persistence/local.js; scripts/rebuild-rural-layout.mjs/normalize-asset-inventory.mjs/qa-browser.mjs/qa-management.mjs; package.json; documentos e capturas. Fases globais continuam parciais. Quatro regiões, pessoal/automação completos, bancos/empréstimos/contabilidade, logística/contratos, pesquisa/especiais, campanha/vitória e Firebase/ranking ainda pendentes; trava entre abas também pendente.
 
 ## Ruas, esquinas e paleta oficial — 14/10/2026
 
@@ -143,3 +143,198 @@ Diretriz atual em CAMPANHA_RURAL.md: ícones sempre acima da propriedade; nívei
 Publicação autorizada pelo usuário no repositório https://github.com/DenilsomLobo/Imperio_do_queijo.git. Histórico remoto consultado: vazio. Git local inicializado em main; CI GitHub Actions para npm ci/test/build preparado. Revisão final da agência corrigiu preservação do posto/nível selecionados após compra. QA final passou cadeia produtiva/combate/gestão e reset/compras nível 3/vitória/derrota persistidas. Não manter o texto histórico de catálogo 48/50/55 como estado atual: são 57 PNGs. Não alterar session-reset.json em nova sessão sem pedido explícito.
 
 Publicação efetivada: push da branch main aprovado pelo GitHub, commit inicial 8455ea0. Código/57 PNGs/documentação/scripts/capturas e CI enviados; arquivos de ambiente, caches, perfis de navegador e dependências excluídos. Publicação do código no repositório, sem afirmar hospedagem GitHub Pages. Para jogar em outro computador, clonar/baixar e executar INICIAR_JOGO.cmd com Node instalado. Continuidade agora pode usar histórico Git normal.
+
+## Painel de fazenda e rebanho — 14/10/2026
+
+Implementado conforme captura anotada: arte da fazenda; explicação de produção/ração; estoques com ícones por qualidade; ração nomeada com preço por unidade e quantidade livre de 1 a 1000; compra de vacas somente na loja com fazenda de destino; gestão de rebanho por espécie/quantidade para transferência ou venda. Sem ração produz 50%; consumo mantém proporção e limites de estoque. Venda por 70% após três dias da compra, registrada no ledger. Transferência preserva idade e valida propriedade/vagas. Botão manual de salvar removido; checkpoints automáticos mantidos.
+
+46 testes passaram e build aprovado (aviso de bundle já conhecido). scripts/qa-farm.mjs passou no Chrome: imagens, compra de 100 rações, loja, bloqueio de revenda e reload. Captura docs/qa-farm-panel.png revisada. Arquivos: src/main.js, src/theme.css, src/data/game-rules.js, src/domain/game.js, src/domain/game.test.js, src/domain/herd.test.js, scripts/qa-farm.mjs e documentação.
+
+Pendente de resposta do usuário: anotação 1 vaca = 1 L/dia e 1 queijo = 1 L aplica a todas as espécies/receitas ou somente Magrela/Minas Frescal? Valores do mestre preservados até definição; demais mudanças estão integradas. Próximo passo: aplicar proporção confirmada, ajustar consumo da IA e expectativas da cadeia, depois seguir roadmap global. Não resetar campanha.
+
+## Cadeias por origem — 14/10/2026
+
+Confirmado pelo usuário e integrado em src/data/dairy.js: Magrela → Fraco, Mimosa → Comum, Premiada → Nobre, Radioativa → Radioativo, Mágica → Mágico, mantendo qualidade do leite até o queijo. Arquivo real do leite radioativo: Cálice de Leite Radioativo Neon.png (não existe leite_radioativo.png). Estoques da fazenda/fábrica/loja usam ícones corretos; gestão de vacas exibe as cinco cadeias com artes fornecidas. Espécies especiais parametrizadas conforme mestre, compra bloqueada por pesquisa própria; sistema de pesquisa completo permanece pendente. Nenhuma espécie especial concedida por catálogo. 52 testes e build aprovados; QA Chrome da fazenda aprovado. Proporção em litros ainda não esclarecida, valores anteriores preservados. Próximo: confirmar proporção e implementar pesquisa na fase prevista.
+
+## Descobertas, litros inteiros e barraca inicial — 14/10/2026
+
+Diretriz posterior implementada: nenhum tipo de leite sem estoque aparece no painel; catálogo e seleção de receitas ocultam origens ainda não descobertas. Comprar uma vaca não revela seu produto. Descoberta ocorre com primeiro litro completo e persiste por empresa; leite/queijo inicial já disponível revela Fraco. Gestão de vacas agora mostra cartões quadrados com imagem/quantidade somente do rebanho de cada fazenda, sem quadro que revele cadeias futuras.
+
+Consumos diários 10/20/40/80/100 para Magrela/Mimosa/De Luxo (asset vaca_premiada)/Radioativa/Mágica. Produção simplificada em 1 L/vaca/dia com ração e metade sem ração; estoque só recebe litros completos, progresso interno é salvo. Receitas ativas Fraco/Comum/Nobre/Radioativo/Mágico usam 1 L da origem correspondente e uma embalagem. Receitas antigas somente para processar lotes/estoques existentes. Botão Salvar jogo no cabeçalho junto de Catálogo, removida indicação Salvo localmente do painel; autosave continua.
+
+Pedido adicional da captura integrado: sale-ze movida de (775,1740) a (660,1840), controle (765,1880), caminhos e interseção recalculados. shopAsset preserva ponto_de_venda_inicial_seu_ze.png enquanto a barraca for do jogador, em vez de substituir por loja aliada genérica. Mesmos IDs/estoques/campanha; nenhuma revisão de reset. Gerador de cadastro atualizado.
+
+Validação: 57 testes em 11 arquivos, build aprovado e git diff --check sem erros. QA Chrome de fazenda/gestão/cadeia produtiva/combate e save/reload aprovado. Novos scripts qa-dairy.mjs e qa-initial-shop.mjs validam descoberta só após litro completo, receitas, persistência, arte inicial, separação da fábrica e clique no novo local. Capturas revisadas: qa-initial-shop-position.png e qa-dairy-discovery.png. Aviso conhecido de bundle grande permanece. Próximas fases: pesquisa para desbloqueio real de espécies especiais, pessoal/automação, finanças/logística e demais requisitos globais; não declarar campanha integral concluída.
+
+## Barraca, bandeira inicial e organização dos PNGs — 14/10/2026
+
+Pedido posterior implementado: sale-ze usa ponto_de_venda_inicial_seu_ze.png enquanto do jogador; sale-ze-control mantém bandeira_capanga_aliado.png inclusive com equipe alocada, sem alterar equipe lógica. Demais lojas compradas pelo jogador usam Ponto_de_venda_aliado.png; demais postos preservam troca bandeira/equipe. Esta é exceção visual explícita à diretriz anterior.
+
+57 PNGs movidos sem edição para subpastas construcoes, producao, seguranca, mapas e icones. Nomes/IDs preservados; src/data/asset-paths.json mapeia caminhos e src/data/assets.js centraliza glob recursivo para jogo/editor/preview. Inventário com path e hashes verificados; referências de documentação e registrador de arte atualizados. assets/README.md explica organização.
+
+59 testes passaram, build aprovado. QA Chrome: barraca com equipe inicial mantém bandeira; loja comprada usa arte aliada; descoberta/receitas/reload/gestão passaram. qa-assets.mjs verificou os 57 PNGs em jogo, editor e preview sem 404 nem erros de página. Captura qa-initial-shop-position.png revisada. Próximas fases globais permanecem no roadmap; nenhuma publicação externa ou reset realizado.
+
+## Reset protegido e consolidação normativa — 14/10/2026
+
+Botão Resetar campanha ao lado de Salvar jogo. Modal acessível com etapa 1 (aviso/Continuar/Cancelar) e etapa 2 (digitar exatamente SAIR + clicar OK). Campo incorreto/espaços não habilitam OK; Enter sozinho não conclui. Cancelar/Escape preservam campanha e reabrir limpa confirmação. Durante gravação, confirmação fica bloqueada contra duplicação.
+
+Reset substitui atomicamente apenas campaigns/current por createGame com UUID novo, antes de trocar memória/cena. Usa fila saveChain e bloqueio temporário de autosave/relógio durante commit; falha mantém estado anterior e permite tentar de novo. Não altera session-reset.json. Nova campanha persistida e recarregável; dados de outras chaves mantidos. Botão só habilitado após carregar a campanha.
+
+Regras de todos os pedidos desta conversa consolidadas em AGENTS.md e seção final idêntica nas duas cópias de CODEX_MASTER_SPEC.md: painel/rebanho, consumo, produção e receitas, descoberta, compra/realocação/venda, barraca/bandeira, subpastas e salvar/reset. Regras posteriores explicitamente prevalecem sobre trechos históricos conflitantes.
+
+Validação: 59 testes e build passaram. scripts/qa-reset.mjs passou no Chrome em contexto isolado: duas etapas, palavras inválidas, SAIR exato, Enter, cancelar, Escape, falha simulada de IndexedDB preservando progresso, retry, substituição real e reload, preservação de outros dados. Captura qa-reset-protected.png revisada. Campanha real do usuário não foi resetada. Próximas fases globais permanecem conforme roadmap.
+
+## Fábrica com funcionários e agências — 14/10/2026
+
+Implementado pedido atual: fábrica com arte/funcionamento, imagem dos empregados alocados, quatro vagas iniciais, bônus cumulativo de produção, automação de lotes e embalagem comprada com caixa real. Agência de funcionários com arte e três cartões clicáveis mostrando contratação/salário/bônus/destino; vendedores preservados. Agência de capangas com arte e três cartões/custos/salários/posto. Bandeira inicial agora substituída pela equipe contratada (pedido novo revoga exceção anterior).
+
+Contratação/salário de funcionários níveis 1/2/3: R$ 2.000/200, 4.000/350, 8.000/600. Bônus 5/10/15% somados; capacidades 4/6/10/16. Sem salário, atividade suspensa, atrasados podem ser pagos; quatro dias não pagos geram demissão e placa/relatório persistido. Capangas têm salários por nível 50/80/120 e saída após quatro dias; reservas incluídas. Coleta e envio de queijo continuam manuais; não confundir com logística automatizada.
+
+Três PNGs novos movidos a assets/pessoal/funcionarios, manifestos/inventário atualizados: 60 PNGs. Regras atualizadas em AGENTS.md e ambas as cópias idênticas do CODEX_MASTER_SPEC.md. Novos módulos domain/workers.js e ui/staff.js; domínio/UI/gestão/mapa e migração integrados. Campanhas preservadas, sem reset.
+
+67 testes automatizados passaram. QA Chrome novo scripts/qa-workers.mjs passou contratação real, cartões/preços, produção sem clique, embalagem paga, imagem do capanga inicial, save/reload e aviso/dismissal de demissão. QA assets (60 imagens no jogo/editor/preview), gestão e barraca passaram; capturas qa-worker-agency.png, qa-factory-workers.png e qa-guard-agency.png revisadas. Build aprovado com aviso de bundle conhecido. Próximos passos globais continuam tratadores/logística/outros funcionários, automação configurável, pesquisa/demais regiões/nuvem/ranking; não declarar campanha mestre integral concluída.
+
+## Serviços bancários de coleta — 14/10/2026
+
+Implementado banco 1 (R$ 200 mil, 1%, até R$ 500 mil de vendas/dia) e banco 2 (R$ 500 mil, 2%, sem limite de vendas). Usuário confirmou limite por vendas totais da empresa/dia e base de taxa vendas menos despesas se positivo. Coleta automática real de lojas próprias, sem duplicar faturamento; limite suspende novas coletas e reinicia no próximo dia. Um contrato ativo, troca encerra anterior, cancelamento imediato disponível. Taxa devida liquidada no fechamento/troca/cancelamento e preservada como dívida se faltar caixa. TaxedProfit evita repetição sobre resultado já apurado.
+
+Painéis com foto/descrição, custo/taxa/limite, situação, motivo de bloqueio, valores diários, contratar/trocar/cancelar e acesso pela gestão financeira. bank-city corrigido de nível 1 para 2 no cadastro/gerador e migração. Regras em AGENTS, duas especificações idênticas e BALANCEAMENTO. Novos domain/banking.js, ui/banking.js e testes/QA; ledger passa a manter resumo diário. Demais finanças patrimoniais e empréstimos continuam pendentes.
+
+75 testes passaram em 13 arquivos, incluindo contratação, exclusividade, caixa finito, limite inclusivo, banco 2 sem limite, reset diário, 1%/2%, prejuízo, cancelamento, dívida, migração e idempotência. QA Chrome qa-banking.mjs passou preços, coleta real, bloqueio diário, troca, cancelamento, save/reload e zero pageerrors em contexto isolado. Capturas qa-bank-level-1/2.png revisadas. Nenhuma contratação/reset na campanha real do usuário. Próximas fases globais continuam pessoal/logística/pesquisa/regiões/cloud/ranking, conforme roadmap; não declarar campanha completa.
+
+## Menu ilustrado de gestão — 14/10/2026
+
+Barra superior redesenhada com oito cartões ilustrados, totais reais, abertura de menus, estados hover/foco/aberto e ícone correspondente no cabeçalho do diálogo. Navegação por Tab/Enter, setas esquerda/direita, Home/End e Escape. Layout de oito colunas no desktop/notebook, quatro colunas em telas intermediárias e faixa com rolagem horizontal em telas pequenas. Valores completos podem quebrar linha, sem ellipsis entre cartões.
+
+Oito SVGs temporários originais em assets/icones/menu-temporario; caminhos isolados em data/menu-icons.json para trocar pelas futuras imagens do usuário. assets.js resolve PNG/SVG por glob; catálogo e recursos continuam usando apenas seus assets normais. Inventário temporário separado em docs/menu-icons-inventory.json; 60 PNGs preservados. Novo src/sector-menu.css; UI/main atualizados. Regras em AGENTS e ambas as especificações idênticas.
+
+QA scripts/qa-sector-menu.mjs passou oito imagens carregadas, todos os painéis reais, estado ativo, navegação por teclado, 1920/1366/900px e valor monetário longo. QA de gestão passou oito menus, catálogo, compras e viewport notebook sem scroll externo. Capturas qa-sector-menu-wide/laptop/tablet.png revisadas; build aprovado. Próximos passos: substituir ícones quando usuário os fornecer e continuar roadmap econômico/campanha; nenhuma alteração econômica ou reset nesta tarefa.
+
+## Dia em 20 minutos — 14/10/2026
+
+Dia reduzido de 60 para 20 min em 1×, 10 min em 2× e 5 min em 4×, com tooltip no seletor. Produção/ração/vendas/salários/taxas acompanham o calendário central. Receita em minutos mantém duração-base; não acelerar todos os processos indiscriminadamente. Limite offline preservado em 8 horas reais (24 dias).
+
+Migração clockVersion=2 preserva dia/horário e progresso antigo sem reset; escala datas de vacas/funcionários/maturação/ledger, conserva segundos de lotes/missões/recuperação e mantém incidentes offline. Regras registradas no AGENTS e nas duas especificações idênticas.
+
+78 testes passaram, incluindo produção/salário em 20 minutos e migração idempotente de calendário e prazos. QA Chrome de descoberta/produção/combate/bancos/funcionários e save/reload passou com os novos intervalos; scripts atualizados para a escala. Próximos passos de balanceamento e demais fases globais permanecem.
+
+## Transportadora automática e dias 5/3/1 — 14/10/2026
+
+Implementado serviço rural por R$ 500 mil + R$ 200/dia: leite automático de fazendas a fábricas próprias e queijo pronto a lojas próprias. Prioridade a fábrica com empregado ativo e loja com vendedor; espaço/qualidade/excedente preservados, sem recursos gratuitos. Funcionários continuam responsáveis por fabricar e banco por recolher caixa. Contrato único com cancelamento, contadores, vencimento e pausa/retomada por caixa insuficiente. Menu com foto, preços e explicações; link em gestão financeira e transferência manual avulsa preservada.
+
+Última instrução de tempo aplicada exatamente: 1×=5 min/dia, 2×=3 min, 4×=1 min. Fatores centrais não lineares 1,5/3,5; relógio único. Migração clockVersion=3 preserva campanhas das escalas anteriores, sem reset; offline8h=96 dias-base. AGENTS e duas especificações idênticas atualizados com ambas as solicitações.
+
+85 testes passaram em 15 arquivos. QA Chrome qa-logistics.mjs passou contratação, leite→queijo→loja→venda sem clique de coleta, manutenção, persistência/cancelamento e mediu um dia exato em cada modo 5/3/1. QA de descoberta e cadeia econômica/combate/save/reload passou. Captura qa-logistics.png revisada. Novos módulos domain/logistics.js, ui/logistics.js e testes; game/main/gestão/clock/balanceamento integrados. Próximas fases globais: veículos/viagens, demais automações, pesquisa/regiões/cloud/ranking e balanceamento completo; serviço rural atual não substitui toda a fase logística do mestre.
+
+## Loja das cinco vacas — 14/10/2026
+
+Pedido atual implementado: loja com cinco cartões de retrato, nome, preço e consumo diário. Todas as espécies compráveis diretamente com dinheiro/vagas, sem pesquisa para Radioativa/Mágica. Preços raros R$ 35 mil/60 mil e consumo 80/100 por dia; demais preços/consumos mantidos. Seleção por cartão, confirmação com fazenda de destino e seleção preservada após compra. Retratos reutilizam PNGs já organizados em producao/vacas; sem duplicação.
+
+Removidos bloqueio de domínio e filtro/aviso de pesquisa da loja. Mistério dos leites/queijos continua até primeira produção. Regras anteriores de pesquisa explicitamente revogadas nos documentos obrigatórios; não é necessário resetar saves. Novo ui/cow-shop.js, main/CSS/regras/testes atualizados.
+
+86 testes passaram; build aprovado. Novo QA Chrome qa-cow-shop.mjs passou cinco imagens, valores/consumo, compra direta das raras, alocação, seleção mantida, descoberta ainda oculta e persistência no reload. QA de fazenda/gestão passou. Captura qa-cow-shop.png revisada. Próximas fases continuam conforme roadmap global; pesquisas permanecem no escopo para outros usos, sem bloquear essas vacas.
+
+
+## Consulta econômica e caixa de testes — 14/10/2026
+Caixa inicial ajustado para R$ 100 milhões, somente em novas campanhas, sem resetar saves existentes. Preços, consumo, produção, vendas e pessoal consolidados em ECONOMIA_ATUAL.md a partir das regras executadas. Próxima etapa: balancear economia após testes do usuário.
+
+
+## Painel de propriedade sobre o mapa — 14/10/2026
+O mapa ocupa toda a largura disponível, inclusive a antiga coluna de gestão direita. Painel de propriedade começa fechado e abre sobre o mapa ao selecionar uma propriedade, inclusive por menus de gestão. Possui borda, rolagem interna e botão X acessível para fechar; Escape fecha quando nenhum diálogo modal está aberto. Fechar preserva estado/progresso e não redimensiona o mapa. O mapa continua navegável na área descoberta.
+
+Implementado em main.js/map-layout.css; próxima etapa permanece balanceamento e testes do jogador.
+
+Validação do painel sobreposto: 88 testes passaram, build aprovado e QA Chrome qa-property-overlay.mjs passou clique na construção, abertura via gestão, fechamento X/Escape, largura integral sem redimensionar canvas e resoluções 1920/1366. Capturas qa-property-overlay-open.png e qa-property-overlay-laptop.png revisadas.
+
+
+## Produção, venda e custos revisados — 14/10/2026
+- Receita por unidade em tempo-base 1×: Fraco 1 min, Comum 3 min, Nobre 5 min, Radioativo 10 min e Mágico 15 min. Relógio central escala fabricação com os modos 1×/2×/4× (dias de 5/3/1 min). Bônus dos funcionários continuam acelerando. Sem bônus e com insumos, uma linha fabrica 5 Fracos por dia. Lotes já iniciados preservam seu prazo; novos lotes usam tempos revisados.
+- Loja com vendedor ativo vende todo estoque restante no fechamento diário, sem limite de 20 unidades nem bloqueio pelo teto de caixa nessa liquidação. Vendas graduais durante o dia permanecem; fechamento esvazia as sobras, registra receita real no dia encerrado antes da taxa bancária e mantém dinheiro na loja para coleta manual/banco. Sem vendedor ativo não vende. Não criar dinheiro sem estoque nem duplicar venda ao recarregar.
+- Capacidade da fazenda nível 1, inclusive inicial: 10 vacas. Saves existentes passam a usar o novo limite sem reset.
+- Capangas nível 1: contratação R$ 125 por equipe de 3 e manutenção R$ 25/dia. Contratação dos níveis superiores preservada em R$ 550 e R$ 1.150; diárias níveis 2/3 seguem R$ 80/120.
+- Funcionário nível 1: contratação R$ 250, manutenção R$ 25/dia. Níveis 2/3 preservados.
+- Ração: R$ 25 a cada 10, equivalente a R$ 2,50/unidade. Consumos de cada espécie permanecem 10/20/40/80/100 por dia.
+
+Próxima etapa: balanceamento após testes do jogador.
+
+
+## Embalagens e Magrela — atualização posterior de 14/10/2026
+Pacote de 10 embalagens custa R$ 25 (R$ 2,50/unidade, inclusive compra automática). Vaca Magrela custa R$ 250. Substitui preços anteriores; consumo e produção permanecem. Aplicar em novas compras sem reembolsos nem reset de campanhas.
+
+
+## Abertura e manutenção de lojas — 14/10/2026
+Abrir/comprar uma loja neutra custa R$ 500. Cada loja de empresa (incluindo inicial e lojas já possuídas) cobra R$ 25 por dia no fechamento central, inclusive offline, separadamente do vendedor. Registrar despesa real no ledger. Sem saldo suficiente, pagar o disponível e manter restante como manutenção pendente, sem caixa negativo nem fechamento automático. Cobrar pendência nas próximas viradas com caixa disponível; neutras não geram manutenção. Menu informa abertura, diária e pendência. Preservar saves e estoques.
+
+Validação da revisão econômica: 95 testes passaram em 17 arquivos, build aprovado e QA de interface Chrome passou. Novos testes cobrem venda integral mista acima do teto antigo, ausência de vendedor, não duplicação após reload, cinco Fracos por dia, capacidade de dez vacas, débitos de ração/embalagem/Magrela/pessoal, abertura e manutenção de duas lojas e pendência sem saldo negativo.
+
+
+## Painel de combate dos capangas — 14/10/2026
+Ao selecionar um posto de capangas, mostrar arte da equipe, dano de ataque e força de defesa reais, base, quantidade/nível, moral, disponibilidade e cooldown. Armamento soma 12% por melhoria exclusivamente ao ataque, máximo 36% (3 níveis); barricada soma 15% por melhoria exclusivamente à defesa local, máximo 45%, sem força própria quando não há equipe. Base = quantidade × fator de nível (1/1,4/1,9); moral multiplica ambas as forças. Missão/recuperação ou moral zero zeram forças. Cooldown sozinho impede novo ataque, sem zerar defesa.
+Explicar empate: forças iguais dão 50% para cada lado e o sorteio decide; não há prioridade automática por nível. Chance = 50 + 40 × (ataque − defesa)/(ataque + defesa), limitada a 5–95%; ambas zeradas dão 50%. Sorteio estritamente abaixo da chance faz atacante vencer, igualdade favorece defesa. Defesa recalculada ao chegar; ataque registrado ao partir. Vitória neutraliza loja para compra. Preservar regras existentes e mostrar bônus nos botões de melhoria; explicação expansível mantém abertura durante atualizações.
+
+Validação do painel: 98 testes passaram, build aprovado, QA Chrome qa-combat-menu.mjs passou contratação real, leitura de forças, melhorias isoladas e expansão mantida após tick. Capturas qa-combat-menu.png e qa-combat-menu-rules.png verificadas. Próxima etapa: balanceamento e demais fases do mestre.
+
+
+## Caixa inicial definitivo solicitado — 14/10/2026
+Jogador começa novas campanhas com R$ 500 (50.000 centavos). Esta regra substitui os R$ 100.000.000 temporários de testes. Preservar campanhas já salvas, sem reset nem substituição de saldo retroativa.
+
+Validação: 98 testes passaram e build aprovado. Cenários de combate/compras múltiplas agora declaram caixa de teste explicitamente, independente do saldo inicial real de R$ 500. Próxima etapa: balanceamento após testes do jogador.
+
+
+## Placa de início — 14/10/2026
+Exibir comece_flag.png sobre o mapa rural à esquerda/sudoeste da fazenda inicial, no ponto indicado pelo usuário (centro x=190, base y=1920, largura 230 no cadastro 3000×2000). Placa decorativa acompanha arraste/zoom e fica acima das artes do mapa, sem alterar propriedades, caminhos, estoques ou cliques. Abrir câmera da partida focada na região inicial para tornar a orientação visível. Arte original organizada em assets/icones/comece_flag.png, com manifesto e inventário atualizados sem modificar pixels.
+
+Validação da placa: 98 testes passaram, build aprovado e QA Chrome qa-start-flag.mjs confirmou carregamento sem erros. Captura docs/qa-start-flag.png revisada: placa visível à esquerda da região inicial, apontando para o começo. Próxima etapa permanece balanceamento e fases do mestre.
+
+
+## Premiada, economia e retaliação — 14/10/2026
+Mimosa custa R$ 1.250 e Queijo Comum vende por R$ 50/unidade. Renomear De Luxo/Premiada para apenas Premiada na interface, preservando ID noble e PNG vaca_premiada; compra R$ 2.500 e Queijo Nobre vende por R$ 100. Fazenda nível 2 custa R$ 5.000 (fórmula existente R$ 2.500 × nível 2) e aceita 20 vacas.
+Quando atacante perde, paga ao defensor vencedor conforme nível da equipe defensora: 1=R$ 50, 2=R$ 100, 3=R$ 150; mesma regra para IA e jogador. Não executar contra-ataque remoto. Prêmio é transferência real entre empresas, separado do custo de missão, despesa do perdedor e receita do defensor. Se faltar caixa, transferir disponível e persistir dívida restante, quitada ao entrar saldo nos ticks seguintes sem saldo negativo nem dinheiro criado. Somente resolver a compensação no resultado definitivo; incidentes offline pendentes não pagam antes da resolução. Mostrar regra/valor no menu de capangas e registrar resultado/ledger.
+
+
+## Nome da queijaria inicial — 14/10/2026
+A propriedade factory-ze passa a se chamar exatamente “Queijaria rudmentar do seu Zé”, conforme texto solicitado, no cadastro compartilhado pelo mapa e pelos menus. Preservar ID, imagem e estado salvo.
+
+Validação: 108 testes passaram em 19 arquivos e build aprovado. Retaliação cobre os três níveis, ambas as empresas, vitória do atacante sem prêmio, pagamento parcial, reload, quitação posterior e incidente offline sem duplicação. Compra de fazenda nível 2 por R$ 5 mil/capacidade 20 e vacas/preços de queijo verificados. QA Chrome do painel sobreposto passou e mostra nome atualizado da queijaria. Próxima etapa permanece balanceamento e demais fases do mestre.
+
+
+## Revisão de custos de expansão — 14/10/2026
+Fazenda nível 2 custa R$ 30.000 e comporta 30 vacas; demais níveis preservados. Preço específico de nível 2 centralizado e compartilhado entre compra e menu, sem multiplicar R$ 30 mil pelo nível. Banco nível 1 contratação R$ 9.000, mantendo taxa e limite. Transportadora contratação R$ 15.000, manutenção R$ 300/dia. Equipe de capangas nível 2 contratação R$ 3.000 e manutenção R$ 50/dia; nível 3 contratação R$ 9.000 e manutenção R$ 100/dia; nível 1 preservado.
+Armamento e barricada têm preços por melhoria comprada: 0→1 R$ 125, 1→2 R$ 1.500, 2→3 R$ 3.500. São custos incrementais (total R$ 5.125 por sequência completa), não preço fixo nem total acumulado. Preservar bônus e máximo de três níveis. Exibir e cobrar a mesma tabela; atualizar valor após cada compra, bloquear nível máximo. Novos preços valem para compras/manutenções futuras, sem reset, reembolso nem substituição de níveis já comprados.
+
+Validação: 110 testes passaram em 20 arquivos, build aprovado e QA Chrome de capangas passou compras reais, forças independentes e preço seguinte R$ 1.500 após primeira melhoria. Testes cobrem três custos de melhorias e bloqueio do quarto nível, preços de contratos/fazenda, contratação dos níveis 2/3 e manutenção da transportadora. Próxima etapa: balanceamento e demais fases do mestre.
+
+
+## Banco 2 e produtos raros — 14/10/2026
+Banco nível 2 custa R$ 60.000 para contratar; taxa diária de 2% e coleta sem limite preservadas. Vaca Radioativa custa R$ 18.000 e Queijo Radioativo vende por R$ 200/unidade. Vaca Mágica custa R$ 36.000 e Queijo Mágico vende por R$ 400/unidade. Preservar consumo, produção, tempos, descoberta e demais regras. Aplicar valores às compras e vendas futuras, inclusive estoque existente, sem reset nem reembolso retroativo.
+
+
+## Estoques ilustrados e valor de venda — 14/10/2026
+Painel das lojas e fábricas e menu superior Estoque de queijo mostram somente tipos com quantidade positiva, com PNG correspondente, nome, quantidade, preço de venda unitário atual e valor total daquele estoque (quantidade × preço). Não confundir valor potencial de venda com caixa coletado ou lucro. Usar receitas centralizadas, incluindo estoques antigos válidos, sem revelar produtos não possuídos. Estoque vazio deve ser informado. Atualizar cartões ao vender, coletar, transferir ou mudar preços, mantendo recursos reais.
+
+Validação: 110 testes passaram, build aprovado e QA Chrome qa-cheese-stock.mjs passou ícones carregados, quantidade, preço unitário e valor total em Estoque de queijo e loja, sem mostrar tipo zerado. Novos preços de banco 2 e vacas raras conferidos; capturas qa-cheese-stock.png e qa-cheese-shop.png revisadas. Próxima etapa: balanceamento e demais fases do mestre.
+
+
+# Produção paralela, início equilibrado e leilões — 14/10/2026 (regra posterior vigente)
+
+Esta seção substitui regras anteriores conflitantes de recursos iniciais, cinco lojas inimigas, capacidade/linhas das fábricas, compra direta de imóveis rivais e derrota ao perder apenas a fazenda inicial.
+
+- Nova campanha: jogador e IA começam com R$ 500, uma Magrela na fazenda, um litro de leite Fraco e um Queijo Fraco na queijaria, 10 embalagens e um vendedor na única loja de cada empresa, sem equipe de capangas grátis. IA inicia apenas com sale-e1 e controle em frente próximo à sua queijaria; outras 12 lojas são neutras. Fazenda e queijaria iniciais de ambas empresas permanecem. Essas condições valem para novas campanhas; não resetar nem retirar recursos/propriedades já salvos.
+- Nome inicial correto: Queijaria rudimentar do seu Zé. Botão/ação de fabricação: Produzir & embalar. Um clique inicia uma unidade/linha com 1 L correspondente e uma embalagem; múltiplos cliques iniciam lotes simultâneos até o limite, sem acelerar os tempos individuais nem criar insumos. Inicial (e equivalente rival) permite cinco funcionários e cinco lotes simultâneos.
+- Queijaria artesanal (factory-level-1): R$ 15.000, 10 funcionários, 10 lotes simultâneos, manutenção R$ 100/dia. Queijaria moderna (factory-level-2): R$ 60.000, 20 funcionários e 20 lotes simultâneos, manutenção R$ 400/dia. Valores por perfil/ID compartilhados entre domínio e menus. Funcionários ativos preenchem filas automaticamente, compram embalagens quando há caixa e somam bônus existentes; sem funcionário o jogador clica por lote. Respeitar estoque, linhas e leite. Manutenção diária também offline; falta de caixa mantém dívida sem saldo negativo.
+- Disputar fazendas, queijarias e contratos bancários/transportadora por leilão. Lance inicial mínimo = valor de compra atual da propriedade + valor de compra das vacas alocadas (fazenda) ou contratação dos funcionários alocados (queijaria), e depois +10% sobre o total. Serviço usa apenas valor atual do contrato +10%, sem unidades. Preços de compra da propriedade neutra seguem disponíveis, mas imóveis rivais não podem ser adquiridos diretamente.
+- Primeiro lance inicia prazo fixo de 10 dias de jogo. Novos lances sobem pelo menos 10% em relação ao maior anterior, arredondados para centavos, sem reiniciar prazo. Reservar valor integral do lance no caixa real; reembolsar integralmente quem foi superado. Quem já lidera não pode dar lance contra si mesmo. Exigir dinheiro suficiente, propriedade elegível e prazo válido, sem limite de distância para leilões (regra de ruas continua somente para ataques de capangas).
+- Se o dono vencer, mantém a propriedade e recebe sua reserva de volta. Se o rival vencer, recebe a propriedade e suas vacas/funcionários/estoques existentes; vendedor recebe o valor final. Reserva não conta como despesa nem devolução como receita; compra/venda só reconhecidas no fechamento. Não duplicar pagamento ao salvar/recarregar. Novos leilões permitem recompra futura. Não encerrar a campanha pela perda isolada da fazenda: resultado final exige todas as lojas e ambas propriedades iniciais adversárias; não encerrar com leilões abertos.
+- Durante disputa, manter operação normal, salários e manutenção, mas bloquear compra, venda/transferência de vacas e contratação de funcionários envolvidos para impedir retirada/manipulação dos itens avaliados. Demissão automática por falta de salário continua; avaliação inicial registrada e bens remanescentes transferidos.
+- Correção expressa do usuário: banco e transportadora NÃO têm propriedade separada dos benefícios. Quem perde o leilão perde o contrato e a automação; vencedor assume contrato correspondente sem segunda contratação e passa a pagar suas taxas/diárias. Antigo titular só recupera por nova aquisição/leilão. Não permitir recontratar diretamente serviço do rival nem cancelar/trocar contrato durante disputa para contornar resultado. Cancelamento fora de disputa continua disponível e libera o serviço. Banco permanece exclusivo por empresa e taxas pendentes do antigo dono continuam devidas.
+- Leilões usam relógio central e encerram também offline; incidentes militares offline continuam protegidos/pedentes conforme regra existente. Painéis mostram avaliação, maior lance/empresa, prazo, mínimo seguinte, reserva e regras; gestão Propriedades lista disputas abertas e Inimigos dá acesso aos imóveis rivais.
+- IA usa mesmos comandos/caixa/recursos. Só entra ou cobre disputa quando há necessidade operacional ou defesa de bem próprio, margem operacional positiva projetada, lance dentro da avaliação mais 30 dias de margem e caixa que preserve pelo menos duas diárias de despesas (mínimo R$ 100) após reservar. Sem recursos/retorno suficiente, não disputa; sem dinheiro gratuito.
+- Saves recebem auctions vazio quando ausente e contratos antigos são vinculados ao titular sem reset. Prazos persistidos, reserva e troca de dono/contratos idempotentes; perfis ampliam capacidades já possuídas sem remover pessoal ou lotes.
+
+Validação integrada: 123 testes passaram em 21 arquivos e build de produção aprovado. QA Chrome qa-auctions-production.mjs passou produção manual paralela 5/10/20, vagas e manutenção, início 1 L/1 queijo, lance do dono com reserva, reload e perda do contrato bancário com recontratação direta bloqueada. Testes incluem 10 dias completos/offline, reembolso único ao dono, transferência de vacas/funcionários e banco/transportadora, recompra, contrato antigo sem benefício, IA iniciando lance real rentável e recusando sem caixa, manutenção e vitória/derrota compatíveis com recompra. Capturas qa-auction-defense.png e qa-auction-bank-lost.png revisadas.
+
+Próximas etapas: balanceamento dos retornos e expansão das estratégias econômicas da IA; demais regiões/sistemas globais permanecem no mestre. Nenhuma campanha real foi resetada; novos recursos e território inicial valem para novas campanhas, enquanto capacidades/preços/leilões são compatíveis com saves existentes.
+
+
+## Preparação de envio ao GitHub — 15/10/2026
+Usuário solicitou envio ao origin https://github.com/DenilsomLobo/Imperio_do_queijo.git, branch main. Projeto validado com 123 testes e build de produção. Inclusos código, assets reorganizados, documentação e evidências de QA; arquivos de ambiente, dependências e dist permanecem ignorados. Fetch inicialmente indisponível por restrição de conectividade; publicação deve ser confirmada pelo retorno do push e comparação com a referência remota. Próximas fases funcionais permanecem as descritas acima.

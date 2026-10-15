@@ -10,7 +10,7 @@ Rede de caminhos gerada por pares de destinos em scripts/rebuild-rural-layout.mj
 
 Migração layout 2→3 aplica uma vez a neutralidade de sale-n1/sale-n2 nos saves antigos. Preserva aquisições do jogador, dinheiro, tempo, estoque, caixa das lojas e demais territórios. Equipes inimigas desses locais retornam à reserva sem duplicação; missões nesses controles são encerradas e equipes liberadas. Partidas novas já começam com os controles neutros. A IA continua finita e pode disputar esses locais futuramente, pelas regras normais de combate; não há bandeira cinza falsa sobre propriedade inimiga. IDs permanecem estáveis.
 
-Arte nova: assets/rural-dirt-road-v1.png, 2172×724 com transparência, ferramenta integrada image_gen. Referência: estrada de terra, pedras e bordas de grama enviada pelo usuário. Nenhum original substituído. Inventário atualizado para 50 PNGs. Preview reproduzível em docs/rural-map-complete.png pelo scripts/export-rural-map.mjs. Exportação continua isolada dos saves. Removidas duplicações de import/desenho de ruas do editor interno.
+Arte nova: assets/mapas/estradas/rural-dirt-road-v1.png, 2172×724 com transparência, ferramenta integrada image_gen. Referência: estrada de terra, pedras e bordas de grama enviada pelo usuário. Nenhum original substituído. Inventário atualizado para 50 PNGs. Preview reproduzível em docs/rural-map-complete.png pelo scripts/export-rural-map.mjs. Exportação continua isolada dos saves. Removidas duplicações de import/desenho de ruas do editor interno.
 
 ## Prompt final (modo integrado)
 

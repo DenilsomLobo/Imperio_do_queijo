@@ -1,0 +1,34 @@
+/* Mapa ocupa a antiga área de zonas; navegação diretamente no terreno. */
+#app{grid-template-rows:56px auto auto minmax(0,1fr) 27px}
+main{grid-template-columns:minmax(0,1fr);gap:0;min-height:0}
+#map{min-width:0;min-height:0;border:3px solid var(--wood);border-radius:10px;margin:6px;overflow:hidden;box-shadow:inset 0 0 0 1px var(--gold)}
+#map canvas{touch-action:none;cursor:grab;display:block}
+#map canvas:active{cursor:grabbing}
+#management-bar{padding:5px 10px 7px}
+.sector-heading{display:none}
+.sector-grid{gap:6px}
+#management-bar .sector-card{grid-template-columns:32px minmax(0,1fr);grid-template-rows:auto auto;gap:2px 7px;padding:6px 8px;min-height:55px;border-radius:8px}
+#management-bar .sector-art{grid-row:1/3}
+#management-bar .sector-art img{width:32px;height:32px}
+#management-bar .sector-label{grid-row:1;grid-column:2;font-size:10px}
+#management-bar .sector-card strong{grid-row:2;grid-column:2;font-size:13px;padding-right:8px}
+#management-bar .sector-open{right:5px;bottom:6px;font-size:10px}
+header{padding-top:4px;padding-bottom:4px}
+@media(max-width:1100px){main{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:850px){#app{grid-template-rows:78px auto auto minmax(0,1fr) 27px}main{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:700px){main{grid-template-columns:minmax(0,1fr)}#management-bar .sector-card{flex-basis:140px}.sector-grid{padding-bottom:4px}#map{margin:3px}}
+
+/* Gestão flutuante: o mapa mantém a largura ao abrir ou fechar. */
+main{position:relative}
+#property-menu{position:absolute;z-index:20;right:14px;top:14px;bottom:14px;width:340px;max-width:calc(100% - 28px);overflow:auto;overscroll-behavior:contain;border:3px solid var(--wood);border-radius:12px;box-shadow:0 8px 28px #35271955,inset 0 0 0 1px var(--gold);padding:20px;background:var(--section)}
+#property-menu .panel-eyebrow{padding-right:34px;min-height:22px}
+#close-property{position:absolute;right:9px;top:8px;width:30px;height:30px;padding:0;display:grid;place-items:center;background:var(--page);color:var(--wood);border:1px solid var(--wood);font-size:18px;line-height:1}
+#close-property:hover{background:var(--back,#DCC9A7)}
+#close-property:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+@media(max-width:700px){#property-menu{right:8px;top:8px;bottom:8px;max-width:calc(100% - 16px);width:320px;padding:16px}}
+
+.combat-team-art{display:block;width:120px;height:120px;object-fit:contain;margin:0 auto 12px}.combat-values{display:grid;grid-template-columns:1fr 1fr;gap:8px}.combat-values>div{padding:10px 8px;border:1px solid var(--border);border-radius:8px;background:var(--page)}.combat-values span{display:block;font-size:11px}.combat-values strong{display:block;font-size:24px;color:var(--wood);font-variant-numeric:tabular-nums}.combat-upgrade{border:1px solid var(--border);border-radius:8px;padding:10px;margin:10px 0;background:var(--page)}.combat-upgrade b{font-size:12px}.combat-upgrade p{margin:5px 0 0}.combat-rules{padding:10px 0}.combat-rules summary{cursor:pointer;font-weight:700;color:var(--wood)}
+
+.cheese-stock-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;margin:12px 0}.cheese-stock-card{display:flex;align-items:center;gap:10px;padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--page)}.cheese-stock-card img{width:48px;height:56px;object-fit:contain;flex:none}.cheese-stock-card>div{min-width:0}.cheese-stock-card strong,.cheese-stock-card span,.cheese-stock-card b{display:block;font-size:12px;line-height:1.5;overflow-wrap:anywhere}.cheese-stock-card b{color:var(--primary)}.cheese-property-stock{margin-bottom:16px}.cheese-empty{font-size:12px;color:var(--muted)}
+
+.auction-info{margin:14px 0;padding:12px;border:2px solid var(--gold);border-radius:9px;background:var(--page)}.auction-info h3{font-size:15px;margin:0 0 8px}.auction-info p{font-size:12px}.auction-active{padding:8px;border:1px solid var(--border);border-radius:6px;background:var(--section)}

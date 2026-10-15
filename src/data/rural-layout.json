@@ -14,7 +14,7 @@
     },
     {
       "id": "factory-ze",
-      "name": "Queijaria rudimentar",
+      "name": "Queijaria rudimentar do seu Zé",
       "type": "factory",
       "owner": "player",
       "x": 820,
@@ -28,11 +28,11 @@
       "name": "Barraquinha do Seu Zé",
       "type": "sale",
       "owner": "player",
-      "x": 775,
-      "y": 1740,
+      "x": 660,
+      "y": 1840,
       "control": [
-        880,
-        1810
+        765,
+        1880
       ],
       "asset": "ponto_de_venda_inicial_seu_ze.png",
       "width": 200,
@@ -178,7 +178,7 @@
       "id": "sale-e2",
       "name": "Posto norte II",
       "type": "sale",
-      "owner": "coalho",
+      "owner": "neutral",
       "x": 1020,
       "y": 541,
       "control": [
@@ -193,7 +193,7 @@
       "id": "sale-e3",
       "name": "Posto norte III",
       "type": "sale",
-      "owner": "coalho",
+      "owner": "neutral",
       "x": 2083,
       "y": 597,
       "control": [
@@ -208,7 +208,7 @@
       "id": "sale-e4",
       "name": "Posto norte IV",
       "type": "sale",
-      "owner": "coalho",
+      "owner": "neutral",
       "x": 2458,
       "y": 1041,
       "control": [
@@ -223,7 +223,7 @@
       "id": "sale-e5",
       "name": "Posto norte V",
       "type": "sale",
-      "owner": "coalho",
+      "owner": "neutral",
       "x": 2458,
       "y": 1374,
       "control": [
@@ -279,7 +279,7 @@
       "y": 1500,
       "width": 220,
       "service": "bank",
-      "level": 1,
+      "level": 2,
       "district": "town"
     },
     {
@@ -715,8 +715,8 @@
       "width": 36,
       "points": [
         {
-          "x": 880,
-          "y": 1810
+          "x": 765,
+          "y": 1880
         },
         {
           "x": 700,
@@ -732,8 +732,8 @@
       "width": 36,
       "points": [
         {
-          "x": 880,
-          "y": 1810
+          "x": 765,
+          "y": 1880
         },
         {
           "x": 1170,
@@ -804,8 +804,8 @@
           "y": 1660
         },
         {
-          "x": 880,
-          "y": 1810
+          "x": 765,
+          "y": 1880
         }
       ]
     },
@@ -821,8 +821,8 @@
           "y": 1580
         },
         {
-          "x": 880,
-          "y": 1810
+          "x": 765,
+          "y": 1880
         }
       ]
     },
@@ -983,8 +983,8 @@
   "intersections": [
     {
       "id": "corner-sale-ze",
-      "x": 880,
-      "y": 1810,
+      "x": 765,
+      "y": 1880,
       "saleId": "sale-ze",
       "roadIds": [
         "path-17",

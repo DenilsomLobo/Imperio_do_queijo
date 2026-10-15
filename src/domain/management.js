@@ -15,8 +15,10 @@ export function management(state, owner = "player") {
     properties: properties.length,
     propertyIds: properties.map((p) => p.id),
     employees:
+      factories.reduce((n,p)=>n+(p.workers ?? []).length,0) +
       shops.filter((p) => p.seller).length +
       teams.reduce((n, t) => n + t.count, 0),
+    factoryWorkers: factories.reduce((n,p)=>n+(p.workers ?? []).length,0),
     sellers: shops.filter((p) => p.seller).length,
     guards: teams.reduce((n, t) => n + t.count, 0),
     cows: farms.reduce((n, p) => n + total(p.cows), 0),

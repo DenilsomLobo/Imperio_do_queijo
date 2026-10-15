@@ -9,7 +9,7 @@ const corners={
  'sale-e4':[2563,1111,'town'],'sale-e5':[2563,1444,'town'],
  'sale-n1':[1370,1020,'town'],'sale-n2':[2063,1000,'town'],'sale-n6':[1625,1222,'town'],
  'sale-n3':[1100,950,'countryside'],'sale-n4':[700,1350,'countryside'],
- 'sale-n5':[1170,1400,'countryside'],'sale-n7':[1450,1720,'countryside'],'sale-ze':[880,1810,'countryside'],
+ 'sale-n5':[1170,1400,'countryside'],'sale-n7':[1450,1720,'countryside'],'sale-ze':[765,1880,'countryside'],
 };
 const positions={
  'bank-rural':[1500,1420,220,'town'],'bank-city':[1940,1500,220,'town'],
@@ -28,6 +28,10 @@ for(const p of layout.properties){
   const[x,y,width,district]=positions[p.id];Object.assign(p,{x,y,width,district});
  }
 }
+// Posição solicitada: barraca ao sul/esquerda, sem a placa da fábrica sobre a arte.
+const initialShop=layout.properties.find(p=>p.id==='sale-ze');
+Object.assign(initialShop,{x:660,y:1840,asset:'ponto_de_venda_inicial_seu_ze.png'});
+layout.properties.find(p=>p.id==='bank-city').level=2;
 // A connected road graph: every endpoint is a shop control or a building entrance.
 const nodes=Object.fromEntries(layout.properties.map(p=>[p.id,p.control?{x:p.control[0],y:p.control[1]}:{x:p.x,y:p.y+30}]));
 const links=[

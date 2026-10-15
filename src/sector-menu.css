@@ -1,0 +1,26 @@
+/* Ícones provisórios trocáveis em data/menu-icons.json. */
+#app {grid-template-rows:70px auto auto minmax(0,1fr) 27px}
+#management-bar {display:block;padding:10px 18px 14px;background:var(--section);border-bottom:1px solid var(--border)}
+.sector-heading {display:flex;justify-content:space-between;align-items:center;margin:0 2px 8px;color:var(--wood)}
+.sector-heading>span {font-size:9px;font-weight:700;letter-spacing:2px}
+.sector-heading small {font-size:10px;color:var(--muted)}
+.sector-grid {display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:9px}
+#management-bar .sector-card {position:relative;display:grid;grid-template-columns:48px minmax(0,1fr);grid-template-rows:48px auto;align-items:center;gap:5px 9px;min-width:0;padding:9px 12px 10px;border:1px solid var(--border);border-radius:13px;background:var(--page);color:var(--text);box-shadow:0 3px 0 #dcc9a766;transition:transform .18s,border-color .18s,box-shadow .18s,background .18s;overflow:hidden;text-align:left}
+#management-bar .sector-card::before {content:'';position:absolute;left:12px;right:12px;bottom:0;height:3px;border-radius:3px 3px 0 0;background:var(--primary);opacity:0;transition:opacity .18s}
+#management-bar .sector-art {display:block;grid-row:1;grid-column:1;line-height:0}
+#management-bar .sector-art img {display:block;width:48px;height:48px;object-fit:contain;transition:transform .18s}
+#management-bar .sector-label {grid-row:1;grid-column:2;color:var(--wood);font-size:11px;font-weight:650;line-height:1.35;letter-spacing:0;text-transform:none;overflow-wrap:normal}
+#management-bar .sector-card strong {grid-row:2;grid-column:1/3;font-size:clamp(12px,.98vw,19px);font-weight:750;line-height:1.25;color:var(--text);margin:0;padding-right:15px;white-space:normal;overflow-wrap:anywhere;overflow:visible;font-variant-numeric:tabular-nums;text-overflow:clip;letter-spacing:-.2px}
+#management-bar .sector-open {position:absolute;right:9px;bottom:10px;font-size:13px;color:var(--link);line-height:1}
+#management-bar .sector-card:hover,#management-bar .sector-card.is-active {background:#fffaf0;border-color:var(--primary);transform:translateY(-2px);box-shadow:0 6px 12px #35271912}
+#management-bar .sector-card:hover::before,#management-bar .sector-card.is-active::before {opacity:1}
+#management-bar .sector-card:hover img {transform:rotate(-4deg) scale(1.07)}
+#management-bar .sector-card:focus-visible {outline:3px solid var(--gold);outline-offset:2px}
+#management-bar [data-manage="enemies"]::before {background:var(--rare)}
+#management-sector-image {width:64px;height:64px;object-fit:contain;flex:none}
+#management-dialog .dialog-heading>div {flex:1}
+@media(min-width:1650px){#management-bar .sector-card{grid-template-columns:58px minmax(0,1fr);grid-template-rows:58px auto;padding:10px 14px 12px}#management-bar .sector-art img{width:58px;height:58px}#management-bar .sector-label{font-size:13px}.sector-heading>span{font-size:10px}.sector-heading small{font-size:11px}}
+@media(max-width:1100px) and (min-width:701px){.sector-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}#management-bar{padding:8px 12px 10px}#management-bar .sector-card{grid-template-columns:40px minmax(0,1fr);grid-template-rows:40px auto;padding:7px 10px}#management-bar .sector-art img{width:40px;height:40px}#management-bar .sector-card strong{font-size:14px}}
+@media(max-width:850px){#app{grid-template-rows:78px auto auto minmax(0,1fr) 27px}}
+@media(max-width:700px){#management-bar{padding:8px}.sector-heading small{display:none}.sector-grid{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 8px;scroll-snap-type:x proximity}#management-bar .sector-card{flex:0 0 150px;scroll-snap-align:start}#management-bar .sector-card strong{font-size:14px}#management-sector-image{width:48px;height:48px}}
+@media(prefers-reduced-motion:reduce){#management-bar .sector-card,#management-bar .sector-art img{transition:none}#management-bar .sector-card:hover,#management-bar .sector-card:hover img{transform:none}}

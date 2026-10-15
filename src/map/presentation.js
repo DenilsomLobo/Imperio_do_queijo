@@ -14,6 +14,7 @@ export function collectionAsset(property) {
 }
 export function shopAsset(slot, property) {
   if (property.type !== "sale") return slot.building;
+  if(slot.id === "sale-ze" && property.owner === "player") return "ponto_de_venda_inicial_seu_ze.png";
   return property.owner === "player" ? "Ponto_de_venda_aliado.png"
     : property.owner === "neutral" ? "Ponto_de_venda_neutro.png" : "Ponto_de_venda_inimiga.png";
 }

@@ -1,0 +1,74 @@
+[
+  {
+    "id": "properties",
+    "path": "icones/menu-temporario/properties.svg",
+    "format": "svg",
+    "viewBox": "0 0 96 96",
+    "temporary": true,
+    "bytes": 805,
+    "sha256": "9CC9F22819343FE17CB4C229B13C6527E8452D797A69EFC8DA7C6E8C3192B002"
+  },
+  {
+    "id": "employees",
+    "path": "icones/menu-temporario/employees.svg",
+    "format": "svg",
+    "viewBox": "0 0 96 96",
+    "temporary": true,
+    "bytes": 882,
+    "sha256": "D63519413B1FA7A1DC167B6CE0EB55F0E266B758F363F5341F0830081FF71D06"
+  },
+  {
+    "id": "milk",
+    "path": "icones/menu-temporario/milk.svg",
+    "format": "svg",
+    "viewBox": "0 0 96 96",
+    "temporary": true,
+    "bytes": 743,
+    "sha256": "06C29D67778151D0D8167EA02D5CB00AB09035D6E499C83C4D772D0134C34D97"
+  },
+  {
+    "id": "cheese",
+    "path": "icones/menu-temporario/cheese.svg",
+    "format": "svg",
+    "viewBox": "0 0 96 96",
+    "temporary": true,
+    "bytes": 800,
+    "sha256": "1036AE9CA286DF2C20C99573564EDA3E119E2FDC97DE9D7EA03BF627F0EC3E33"
+  },
+  {
+    "id": "cows",
+    "path": "icones/menu-temporario/cows.svg",
+    "format": "svg",
+    "viewBox": "0 0 96 96",
+    "temporary": true,
+    "bytes": 840,
+    "sha256": "028828FB508C1F6D73A6BB59684A628443B20A1E3982FB1C8A47887BBF276B21"
+  },
+  {
+    "id": "revenue",
+    "path": "icones/menu-temporario/revenue.svg",
+    "format": "svg",
+    "viewBox": "0 0 96 96",
+    "temporary": true,
+    "bytes": 851,
+    "sha256": "1660CAAE3491CB6954A33FEB152A3620E1A9415F658B6B2775202D79536D05A5"
+  },
+  {
+    "id": "cash",
+    "path": "icones/menu-temporario/cash.svg",
+    "format": "svg",
+    "viewBox": "0 0 96 96",
+    "temporary": true,
+    "bytes": 839,
+    "sha256": "C5A2E293AB9D67F598682DE3CF89A652749B1ED0ED1786ED7A2254BAC50133B8"
+  },
+  {
+    "id": "enemies",
+    "path": "icones/menu-temporario/enemies.svg",
+    "format": "svg",
+    "viewBox": "0 0 96 96",
+    "temporary": true,
+    "bytes": 778,
+    "sha256": "5002633F84FFE8896ED1A8554A7EEF2907EC5034D460A388846C4D001848D921"
+  }
+]

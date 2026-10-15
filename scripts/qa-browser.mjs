@@ -1,7 +1,7 @@
 import { chromium } from "playwright-core";
 import assert from "node:assert/strict";
 
-const browser = await chromium.launch({ channel: "chrome", headless: true });
+const browser = await chromium.launch({ ...(process.env.QA_BROWSER ? {executablePath:process.env.QA_BROWSER} : {channel:"chrome"}), headless: true });
 try {
   const context = await browser.newContext({
     viewport: { width: 1600, height: 1000 },
@@ -21,6 +21,7 @@ try {
     const { ruralMap } = await import("/src/data/world.js");
     const { collectorPosition } = await import("/src/map/presentation.js");
     return {
+      day:(await import("/src/data/game-rules.js")).DAY,
       slots: ruralMap.slots,
       width: ruralMap.width,
       height: ruralMap.height,
@@ -73,7 +74,7 @@ try {
   await page.waitForTimeout(300);
   await page.screenshot({ path: "docs/qa-rural-map.png" });
   await page.locator('[data-action="buyFeed"]').click();
-  await advance(480000);
+  await advance(layout.day);
   const farm = slots.find((s) => s.id === "farm-ze");
   await clickPoint(layout.collectors[farm.id].x, layout.collectors[farm.id].y);
   assert.match(await page.locator("#status").textContent(), /Ação concluída/);
@@ -87,9 +88,9 @@ try {
     layout.collectors[factory.id].y,
   );
   const before = await saved();
-  assert.equal(before.properties["sale-ze"].stock["frescal:weak"], 6);
-  assert.equal(before.properties["factory-ze"].ready["frescal:weak"], 0);
-  await advance(181000);
+  assert.equal(before.properties["sale-ze"].stock["weak:weak"], 6);
+  assert.equal(before.properties["factory-ze"].ready["weak:weak"], 0);
+  await advance(layout.day / 20 + 1000);
   const shop = slots.find((s) => s.id === "sale-ze");
   await clickPoint(layout.collectors[shop.id].x, layout.collectors[shop.id].y);
   const collected = await saved();
