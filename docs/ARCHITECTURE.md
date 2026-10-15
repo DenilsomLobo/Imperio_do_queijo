@@ -1,5 +1,11 @@
 # Arquitetura
 
+## Estratégia da IA — 15/10/2026
+
+`domain/ai.js` separa `aiEconomy` (projeção sem lançar receita) de `runAi` (decisões por comandos). `game.js` fornece `act`, `estimate` e `roadConnected`, evitando dependência circular e preservando validações de caixa, capacidade, propriedade e combate. Reserva inclui duas diárias previstas, mínimo R$ 100, e passivos conhecidos; compra de ração compara margem com/sem insumo, incluindo alimentação parcial e gargalo de linhas. Guarnições também consideram essa reserva.
+
+`auctionDecision` aceita contexto estratégico opcional para domínio, preservando comandos, reservas, prazos e transferências. Bens neutros/públicos sem leilão usam aquisição direta. Banco alternativo é excluído quando já há contrato, salvo defesa do atual. `company.strategy` guarda última decisão/projeção, opcional em saves antigos, exibida em Inimigos. Intervalo e chance mínima em `rules.aiInterval` e `rules.aiAttackChance`; offline não investe nem inicia guerra/leilões novos. Custos iniciais ajustados por autorização do usuário em `BALANCEAMENTO_INICIAL.md`, sem migração financeira retroativa. Testes usam recursos de fixtures separados das campanhas reais.
+
 ## Diagnóstico inicial
 
 Na primeira inspeção havia apenas 47 PNGs e dois documentos vazios; estes foram preenchidos durante a sessão e relidos. Não havia código, dependências, testes, scripts, histórico Git ou sistemas funcionais a preservar. A especificação na raiz foi copiada integralmente para `docs/CODEX_MASTER_SPEC.md`, caminho exigido por AGENTS.md. Manter esse documento como fonte normativa; sincronizar a cópia da raiz quando editar a especificação.
@@ -161,3 +167,33 @@ factoryProfiles em game-rules.js define preço, linhas, funcionários e manuten�
 auctions.js centraliza elegibilidade, avaliação por propriedade+vacas/contratações, mínimo em centavos, reserva integral/reembolso e fechamento. state.auctions é persistido por ID, iniciado com prazo fixo de 10 DAY. Reserva/devolução movimentam caixa sem receita/despesa; aquisição/venda reconhecidas no fechamento. change de titular de serviços acontece no game.js: encerra contrato anterior e taxas antigas continuam devidas; vencedor assume automação e futuras diárias/taxas. Travas nos comandos impedem alteração de unidades avaliadas e cancelamento/troca de contrato em disputa.
 
 Tick finaliza leilões inclusive offline, depois de operações do dia; updateCampaign só encerra sem disputas abertas e exige lojas mais ambas propriedades iniciais, permitindo recompra após perda isolada. MigrateSave acrescenta auctions vazio e vincula contratos antigos ao dono sem reset. Validação verifica leilões, titulares, valores/prazos e persistência. Clock migration também converte prazos de leilões. UI de auctions.js mostra avaliação, reserva, prazo e lance; gestão lista disputas. IA usa auctionDecision e o mesmo comando bidProperty: margem positiva, necessidade operacional, teto de avaliação+30 dias de retorno e caixa com reserva de 2 diárias, mínimo R$ 100.
+
+
+## Relógio versão 4 — 15/10/2026
+DAY=60000 e speedFactors=1/2/6 para modos 1×/2×/4× (dias de 60/30/10 s). Migração aceita versões 1/2/3 (dias de 60/20/5 min), preservando calendário e prazos diários proporcionalmente e tempo-base restante de lotes/missões. Receitas ativas usam 10000/30000/60000/120000/150000 ms. Bônus de funcionários seguem no domínio, sem relógio separado.
+
+
+## Estoque comercial compartilhado — 15/10/2026
+shop-stock.js centraliza estoque comercial por empresa (company.shopStock), capacidade agregada e preço com bônus aditivo a partir da segunda loja. p.stock fica vazio após importação de estoque legado; não armazenar cópias em cada loja. Normalização ocorre na migração, antes dos comandos e nos ticks para preservar saves anteriores. Menus usam sharedShopStock sem mutação; management soma queijo uma única vez. Coleta manual e logística usam collectCheese sem destino. Caixa/vendedor permanecem por loja. Fechamento divide estoque entre vendedores ativos antes da apuração bancária. inventory.js e buildings.js derivam conteúdo do estado real.
+
+
+## Cartões de upgrades — 15/10/2026
+ui/combat-upgrades.js deriva estado de team.weapon/post.barricade e preços/bônus de rules; apenas próxima etapa fica clicável. data-action reutiliza upgradeWeapon/upgradeBarricade; o domínio continua validando disponibilidade, saldo, sequência e limite. Nenhuma alteração do schema de saves.
+
+Integração dos setores em 15/10/2026: menu-icons.json utiliza os oito PNGs fornecidos em assets/icones/menu-temporario, pois os SVGs anteriores foram removidos. O inventário de menu registra formato/dimensões/hashes atuais; comandos e IDs dos setores preservados.
+
+
+## Perfis, entrada e nuvem — 15/10/2026
+player-entry.js bloqueia inicialização da simulação até escolha do perfil. IndexedDB existente preserva current por compatibilidade e usa campaign:{id}/profile:{id}; gravação de campanha e placar local na mesma transação. Primeiro perfil adota current sem dono. Autenticação Firebase fica em chave separada firebase-auth:{projectId}:{profileId}, sem tokens no save/ranking. firebase.js usa REST oficial, signUp anônimo, refresh e Bearer ID token; sem configuração não faz chamadas. Commit atômico de saves/{uid} privado e ranking/{uid}, JSON limitado a 850 KB, fila serial e checkpoint no máximo uma vez/minuto (salvar/reset forçam nova tentativa). Local é gravado antes e erros de rede não apagam progresso. Carregamento prefere snapshot mais recente por savedAt. Consulta Firestore filtra rulesVersion, ordena cash DESC e limita a 10, com índice fornecido. Regras limitam dono/estrutura; valor continua declarado pelo cliente, sem proteção antitrapaça autoritativa. Cloud real, regras no emulador, coordenação entre abas e login recuperável entre dispositivos ainda pendentes.
+
+
+## Rede militar coletiva — 15/10/2026
+security-network.js centraliza garrisonCount/garrisonBonus e reserva operacional da IA. Contagem derivada de sale.securityId → security.team, com proprietário compartilhado e count positivo. attackStrength/defenseStrength aceitam estado para multiplicar rede sem persistir bônus duplicáveis; todos os chamadores funcionais (estimate, act, resolve, IA e UI) passam contexto. Assinaturas sem contexto mantêm cálculo local para compatibilidade de ferramentas/testes. resolve usa defesa atual; mission.attack permanece snapshot. AI aloca reservas/equipes em toda a empresa antes das decisões de ataque, inclusive postos sem inimigo vizinho; orçamento usa salários e manutenção reais.
+
+
+## Gestão de recursos adquiridos — 15/10/2026
+ui/owned-resources.js renderiza dados reais da empresa em cartões com data-property para navegação existente. Agrupa vacas por espécie/fazenda e lotes por receita/qualidade/fase/fábrica; não agrega lotes em inventário pronto. domain/sales.js filtra ledger por owner, kind Venda ao consumidor, property opcional e Math.floor(time/DAY), somando revenue sem transformar coleta em receita. Indicador dailySales da gestão usa o mesmo cálculo. buildingCards filtra owner player. staffAiShops mantém as mesmas regras e reserva de duas diárias, chamado em tick online e após expansão da IA; guardAsset seleciona bandeira/equipe durante refresh do mapa. Sem alterações de schema de saves.
+
+
+## Gest?o financeira e dom?nio ? 15/10/2026
+financialSnapshot deriva fluxo, hist?rico di?rio, categorias, estabelecimentos, compromissos e passivos do estado/ledger reais, sem criar lan?amentos. shopIsActive centraliza vendedor contratado/ativo; salePrice recebe a loja que vende e aplica b?nus local de vendedor. supplyDrafts mant?m entrada por propriedade/insumo sem persistir rascunho como estoque. dominanceProgress deriva os 24 objetivos e contratos v?lidos; updateCampaign usa o mesmo c?lculo das barras, com bloqueio por leil?o aberto. enemyManagement reutiliza cart?es parametrizados por propriet?rio. Nenhuma migra??o concede bens ou reseta campanha.

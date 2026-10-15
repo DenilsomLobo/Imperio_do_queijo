@@ -40,9 +40,9 @@ it('sem funcionário produção é manual; automação respeita caixa, estoque e
 it('cobra salário um dia após contratação e registra despesa por nível',()=>{
  let s=funded();s.time=10000;s=hire(s,2);s.properties['factory-ze'].milk={};
  const cash=s.companies.player.cash;s=advance(s,DAY-1000,{offline:true});
- expect(s.companies.player.cash).toBe(cash-3500-rules.shopDailyMaintenance); // vendedor: virada global do dia
+ expect(s.companies.player.cash).toBe(cash-rules.sellerSalary-rules.shopDailyMaintenance); // vendedor: virada global do dia
  s=advance(s,1000,{offline:true});
- expect(s.companies.player.cash).toBe(cash-3500-rules.shopDailyMaintenance-rules.workerTiers[2].salary);
+ expect(s.companies.player.cash).toBe(cash-rules.sellerSalary-rules.shopDailyMaintenance-rules.workerTiers[2].salary);
  expect(s.ledger.some(l=>l.kind==='Salário de funcionário'&&l.amount===-35000)).toBe(true);
 });
 it('quatro dias sem pagamento removem trabalhador e deixam placa persistida',()=>{

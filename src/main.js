@@ -1,3 +1,7 @@
+import {playerEntry,rankingUI} from './ui/player-entry.js';
+import {cloud} from './persistence/firebase.js';
+import {combatUpgradeCards} from './ui/combat-upgrades.js';
+import {sharedShopStock,shopCapacity,shopBonus,companyShops,salePrice} from './domain/shop-stock.js';
 import {auctionInfo,auctionActions} from "./ui/auctions.js";
 import {factoryProfile} from "./data/game-rules.js";
 import {cheeseStockCards} from "./ui/cheese-stock.js";
@@ -19,6 +23,7 @@ import "./theme.css";
 import "./sector-menu.css";
 import "./map-layout.css";
 import './campaign.css';
+import './player-entry.css';
 import { ruralMap } from "./data/world.js";
 import { rules, DAY } from "./data/game-rules.js";
 import {
@@ -34,7 +39,7 @@ import { load, save } from "./persistence/local.js";
 import { mapScene } from "./map/game-scene.js";
 import { managementUI } from "./ui/management.js";
 import reset from './data/session-reset.json';
-import {territoryControl} from './domain/campaign.js';
+
 
 let state,
   scene,
@@ -46,6 +51,7 @@ let state,
   storageFailed = false,
   resettingCampaign = false;
 const $ = (id) => document.getElementById(id);
+const supplyDrafts=new Map();
 const money = (n) =>
   (n / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 const amount = (n) =>
@@ -64,8 +70,22 @@ const escape = (s) =>
         c
       ],
   );
+let activeProfile;
+const ranking=rankingUI(assets,()=>activeProfile);
+activeProfile=await playerEntry(assets,ranking);
+function freshCampaign(){const s=createGame();s.campaignId='rural-'+crypto.randomUUID();s.playerProfile={...activeProfile};return s;}
+document.querySelector('#app').classList.remove('entry-mode');
+document.querySelector('#app').inert=true;
+let lastCloudSave=0;
+function queueCloud(snapshot,force=false){
+ if(!cloud.enabled())return;
+ if(!force && Date.now()-lastCloudSave<60000)return;
+ lastCloudSave=Date.now();
+ $('cloud-state').textContent='Sincronizando…';
+ cloud.save(snapshot).then(()=>{$('cloud-state').textContent='Salvo na nuvem';}).catch(e=>{$('cloud-state').textContent='Salvo localmente · nuvem pendente';$('cloud-state').title=e.message;});
+}
 document.querySelector("#app").innerHTML =
-  `<header><div class="brand"><strong>IMPÉRIO DO QUEIJO</strong><span>Queijópolis · gestão e conquista</span></div><div id="hud"></div><label class="speed">Velocidade <select id="speed" title="1×: dia em 5 min · 2×: 3 min · 4×: 1 min"><option value="1">1×</option><option value="2">2×</option><option value="4">4×</option></select></label><button id="save">Salvar jogo</button><button id="reset-campaign" class="danger-button" disabled>Resetar campanha</button></header><section id="management-bar" aria-label="Gestão da empresa"></section><main><section id="map"></section><aside id="property-menu" aria-label="Gestão da propriedade" hidden><button id="close-property" type="button" aria-label="Fechar menu da propriedade" title="Fechar menu">✕</button><div class="panel-eyebrow">PROPRIEDADE SELECIONADA</div><h2 id="title">Zona rural</h2><div id="property-portrait"></div><p id="intro">Clique nas construções para gerenciar. Os círculos em frente às lojas mostram quem controla cada ponto.</p><div id="panel"></div><p id="status" role="status">Carregando campanha…</p><button id="pending" hidden>Resolver incidentes pendentes</button><details><summary>Relatórios e finanças</summary><div id="reports"></div></details></aside></main><footer>Arraste para explorar · roda do mouse para zoom · ícones dourados coletam recursos.</footer><dialog id="management-dialog" aria-labelledby="management-title"><div class="dialog-heading"><img id="management-sector-image" alt="" width="64" height="64" hidden><div><small>GESTÃO DO IMPÉRIO</small><h2 id="management-title"></h2></div><button data-close aria-label="Fechar gestão">✕</button></div><div id="management-content"></div></dialog>`;
+  `<header><div class="brand"><a class="avatar-placeholder" href="./index.html" aria-hidden="true" tabindex="-1"></a><a id="home-logo" href="./index.html" aria-label="Voltar à página inicial"><img class="brand-logo" src="${assets["text_logo.png"]}" alt="Império do Queijo"></a></div><div class="player-identity"><strong id="player-label"></strong><small id="cloud-state">Salvamento local</small></div><div id="hud"></div><label class="speed">Velocidade <select id="speed" title="Dia: 60 s / 30 s / 10 s"><option value="1">1× · dia em 1 min</option><option value="2">2× · dia em 30 s</option><option value="4">4× · dia em 10 s</option></select></label><button id="save" class="header-action"><img src="${assets["icon_salvar.png"]}" alt="">Salvar</button><button id="reset-campaign" class="header-action danger-button" disabled><img src="${assets["icon_resetar.png"]}" alt="">Resetar</button><button id="ranking" class="header-action"><img src="${assets["icon_ranking.png"]}" alt="">Ranking</button></header><section id="management-bar" aria-label="Gestão da empresa"></section><main><section id="map"></section><aside id="property-menu" aria-label="Gestão da propriedade" hidden><button id="close-property" type="button" aria-label="Fechar menu da propriedade" title="Fechar menu">✕</button><div class="panel-eyebrow">PROPRIEDADE SELECIONADA</div><h2 id="title">Zona rural</h2><div id="property-portrait"></div><p id="intro">Clique nas construções para gerenciar. Os círculos em frente às lojas mostram quem controla cada ponto.</p><div id="panel"></div><p id="status" role="status">Carregando campanha…</p><button id="pending" hidden>Resolver incidentes pendentes</button><details><summary>Relatórios e finanças</summary><div id="reports"></div></details></aside></main><footer>Arraste para explorar · roda do mouse para zoom · ícones dourados coletam recursos.</footer><dialog id="management-dialog" aria-labelledby="management-title"><div class="dialog-heading"><img id="management-sector-image" alt="" width="64" height="64" hidden><div><small>GESTÃO DO IMPÉRIO</small><h2 id="management-title"></h2></div><button data-close aria-label="Fechar gestão">✕</button></div><div id="management-content"></div></dialog>`;
 const dashboard = managementUI({
   getState: () => state,
   assets,
@@ -107,6 +127,21 @@ function options(list) {
 function button(action, label, extra = "") {
   return `<button data-action="${action}" ${extra}>${label}</button>`;
 }
+function supplyControls(kind){
+ const feed=kind==='feed',id=kind+'-quantity',name=feed?'ração':'embalagens';
+ const value=supplyDrafts.get(selected+':'+kind) ?? '10';
+ return `<label>Quantidade de ${name}<input id="${id}" type="number" min="1" max="${rules.supplyPurchaseLimit}" step="1" value="${escape(value)}"></label>`+
+ button(feed?'buyFeed':'buyPackaging',`Comprar ${name}`)+`<p id="${kind}-quote" class="supply-quote" role="status"></p>`;
+}
+function updateSupplyQuote(kind){
+ const input=$(kind+'-quantity');if(!input)return;
+ const feed=kind==='feed',price=feed?rules.feedPrice:rules.packagingPrice,quantity=Number(input.value);
+ const valid=Number.isSafeInteger(quantity)&&quantity>=1&&quantity<=rules.supplyPurchaseLimit;
+ const target=$('panel').querySelector(`[data-action="${feed?'buyFeed':'buyPackaging'}"]`);
+ target.disabled=!valid;
+ target.innerHTML=`<img class="resource-icon" src="${assets[feed?'icon_racao.png':'icon_embalagem.png']}" alt="">Comprar ${valid?amount(quantity)+' ':''}${feed?'rações':'embalagens'}${valid?' · '+money(quantity*price):''}`;
+ $(kind+'-quote').textContent=valid?`${money(price)} por unidade · total: ${money(quantity*price)}`:`Informe uma quantidade inteira de 1 a ${amount(rules.supplyPurchaseLimit)}.`;
+}
 function select(id, label, list) {
   return `<label>${label}<select id="${id}">${options(list)}</select></label>`;
 }
@@ -119,18 +154,18 @@ function stats() {
   if (p.type === "farm")
     html += `<p>Leite acumulado: <b>${amount(total(p.milk))} / ${rules.milkCapacity} L</b><br>Ração: ${amount(p.feed)}<br>Consumo com ração: ${amount(Object.entries(p.cows).reduce((n,[k,c])=>n+c*rules.cows[k].feed,0))} rações/dia<br>Vacas: ${total(p.cows)} / ${rules.farmCapacities[p.level - 1]}<br>Produção potencial: ${amount(Object.entries(p.cows).reduce((n, [k, c]) => n + c * rules.cows[k].milk, 0))} L/dia ${p.feed <= 0 ? "· sem ração: 50% da produção" : ""}</p>`;
   if(p.milk) html += '<div class="milk-stocks">'+Object.entries(dairy).filter(([k])=>(p.milk[k] ?? 0)>=1 && discoveredMilk(state).includes(k)).map(([k,c])=>'<div><img src="'+assets[c.milkAsset]+'" alt="Leite '+c.name+'"><span>Leite '+c.name+'<b>'+amount(p.milk[k] ?? 0)+' L</b></span></div>').join('')+'</div>';
-  if(p.ready || p.stock) html += cheeseStockCards(p.ready ?? p.stock,assets);
+  if(p.ready || p.stock) html += cheeseStockCards(p.type==='sale' ? sharedShopStock(state,p.owner) : p.ready,assets,id=>salePrice(state,p.owner,id,p.type==='sale'?p:undefined));
   if (p.type === "factory")
     html += `<p>Linhas de Produzir &amp; embalar: <b>${factoryProfile(p).lines}</b> · em produção: ${p.batches.filter(b=>b.phase==='production').length}<br>Manutenção da queijaria: ${money(factoryProfile(p).daily)}/dia${p.maintenanceDebt ? " · Pendente: "+money(p.maintenanceDebt) : ""}<br>Leite armazenado: <b>${amount(total(p.milk))} / ${rules.factoryMilkCapacity} L</b><br>Embalagens: ${p.packaging}<br>Queijo pronto: <b>${total(p.ready)} / ${rules.cheeseCapacity}</b></p>${p.batches.map((b) => `<p>Queijo ${dairy[b.quality].name} · ${b.phase === "production" ? "Fabricação" : "Maturação"} · ${Math.max(0, Math.ceil((b.due - state.time) / (1000*(b.phase==="production"?productionMultiplier(p):1))))} s restantes</p>`).join("")}`;
   if(p.type==='security') $('intro').textContent='Gerencie o ataque e a defesa desta loja. Armamento aumenta o dano de ataque; barricada aumenta a força de defesa. Consulte abaixo os valores reais, bônus e regras da disputa.';
   if(p.type==='factory') html+='<h3>Equipe da fábrica · '+(p.workers ?? []).length+'/'+workerCapacity(p)+'</h3>'+workerCards(p,assets)+'<p>Produção '+(activeWorkers(p).length?'automática':'manual')+' · velocidade +'+Math.round((productionMultiplier(p)-1)*100)+'%</p>';
   if(p.staffNotices?.length) html+='<div class="staff-notice" role="status">'+p.staffNotices.map(n=>'<p>'+escape(n.text)+'</p>').join('')+'</div>';
   if (p.type === "sale")
-    html += `<p>Estoque: <b>${total(p.stock)} / ${rules.shopCapacity} queijos</b><br>Saldo para coleta: <b>${money(p.till)}</b><br>Vendas finais: ${p.sales}<br>Manutenção: ${money(rules.shopDailyMaintenance)}/dia${p.maintenanceDebt ? " · Pendente: "+money(p.maintenanceDebt) : ""}<br>Estoque restante vendido no fim do dia (com vendedor ativo)<br>Vendedor: ${p.seller ? (p.sellerActive ? "ativo" : "salário em atraso") : "não contratado"}</p>`;
+    html += `<p>Estoque: <b>${total(sharedShopStock(state,p.owner))} / ${shopCapacity(state,p.owner)} queijos compartilhados</b><br>Disponível em todas as lojas da empresa, sem duplicar unidades.<br>Bônus de venda: +${Math.round(shopBonus(state,p.owner)*100)}% · ${companyShops(state,p.owner).length} loja(s); +10% por loja além da primeira.<br>Saldo para coleta: <b>${money(p.till)}</b><br>Vendas finais: ${p.sales}<br>Manutenção: ${money(rules.shopDailyMaintenance)}/dia${p.maintenanceDebt ? " · Pendente: "+money(p.maintenanceDebt) : ""}<br>Estoque restante vendido no fim do dia (com vendedor ativo)<br>Atividade: ${p.seller && p.sellerActive ? "ativa · vendedor +1% no preço" : "inativa até ter vendedor ativo"}<br>Vendedor: ${p.seller ? (p.sellerActive ? "ativo" : "salário em atraso") : "não contratado"}</p>`;
   if (p.type === "security") {
     const t = p.team;
-    html += combatInfo(p,state.time,assets);
-    if(t) html += '<p>'+ (attackStrength(t,state.time)>0?'Equipe disponível':'Equipe sem força disponível')+'<br>Recuperação/missão: '+Math.max(0,Math.ceil((Math.max(t.busyUntil,t.recoverUntil)-state.time)/1000))+' s<br>Cooldown para atacar: '+Math.max(0,Math.ceil((t.cooldownUntil-state.time)/1000))+' s</p>';
+    html += combatInfo(p,state.time,assets,state);
+    if(t) html += '<p>'+ (attackStrength(t,state.time,state,p.owner)>0?'Equipe disponível':'Equipe sem força disponível')+'<br>Recuperação/missão: '+Math.max(0,Math.ceil((Math.max(t.busyUntil,t.recoverUntil)-state.time)/1000))+' s<br>Cooldown para atacar: '+Math.max(0,Math.ceil((t.cooldownUntil-state.time)/1000))+' s</p>';
   }
   html+=auctionInfo(state,p);
   return html;
@@ -171,7 +206,7 @@ function renderPanel() {
         select('employee-factory','Fábrica de destino',owned('factory')) +
         button('hireAtFactory','Contratar e alocar funcionário') +
         '<hr><h3>Vendedores</h3>' + select('service-target','Ponto de venda',owned('sale')) +
-        button('hireAtShop','Contratar vendedor · '+money(rules.sellerHire)) +
+        button('hireAtShop','<img class="resource-icon" src="'+assets['icon_vendedor.png']+'" alt="">Contratar vendedor · '+money(rules.sellerHire)+' + '+money(rules.sellerSalary)+'/dia') +
         button('openServiceTarget','Gerenciar ponto de venda');
     if (service === "security")
       actions += recruitmentCards('guard',assets) +
@@ -190,7 +225,6 @@ function renderPanel() {
         (state.companies.player.logistics ? button('cancelLogistics','Cancelar transportadora',state.auctions?.[p.id]?'disabled':'') : button('hireLogistics','Contratar transporte automático',state.auctions?.[p.id] || !['player','public','neutral'].includes(p.owner)?'disabled':'')) +
         '<hr><h3>Transferência manual avulsa</h3>' +
         select('service-source','Fábrica de origem',owned('factory')) +
-        select('service-target','Loja de destino',owned('sale')) +
         button('dispatchCheese','Transferir queijo pronto');
   }
   if (p.type === "land")
@@ -209,8 +243,7 @@ function renderPanel() {
       actions +=
         select("factory-target", "Fábrica de destino", owned("factory")) +
         button("collectMilk", "Coletar todo o leite possível") +
-        '<p>Ração · '+money(rules.feedPrice)+' por unidade</p><label>Quantidade de ração<input id="feed-quantity" type="number" min="1" max="1000" step="1" value="10"></label>' +
-        button('buyFeed','Comprar ração') + button('cowShop','Visitar loja de vacas') +
+        supplyControls('feed') + button('cowShop','Visitar loja de vacas') +
         '<h3>Gestão de vacas</h3>'+herdCards(p,assets)+'<label>Espécie<select id="manage-cow">'+Object.entries(p.cows).filter(([,n])=>n>0).map(([k,n])=>'<option value="'+k+'">'+rules.cows[k].name+' · '+n+'</option>').join('')+'</select></label><label>Quantidade<input id="cow-quantity" type="number" min="1" step="1" value="1"></label>' +
         select('cow-target','Transferir para fazenda',owned('farm').filter(f=>f.id!==p.id)) +
         button('moveCow','Transferir vacas',owned('farm').length<2 ? 'disabled' : '') +
@@ -219,16 +252,12 @@ function renderPanel() {
     }
     if (p.type === "factory") {
       actions +=
-        `<label>Queijo<select id="recipe">${Object.entries(rules.recipes).filter(([k,r])=>r.quality && discoveredMilk(state).includes(r.quality)).map(([k,r])=>`<option value="${k}">${r.name} · ${r.milk} L · ${r.time/60000} min</option>`).join("")}</select></label>` +
+        `<label>Queijo<select id="recipe">${Object.entries(rules.recipes).filter(([k,r])=>r.quality && discoveredMilk(state).includes(r.quality)).map(([k,r])=>`<option value="${k}">${r.name} · ${r.milk} L · ${r.time/1000} s em 1×</option>`).join("")}</select></label>` +
         button("produce", "Produzir & embalar · 1 queijo") +
         button("visitEmployees","Contratar funcionários na agência") +
         ((p.workers ?? []).some(w=>w.missedWages>0) ? button("payWorkerWages","Pagar salários atrasados") : "") +
-        button(
-          "buyPackaging",
-          `Comprar 10 embalagens · ${money(rules.packagingPrice * 10)}`,
-        ) +
-        select("shop-target", "Loja de destino", owned("sale")) +
-        button("collectCheese", "Levar todo o queijo pronto possível");
+        supplyControls('packaging') +
+        button("collectCheese", "Enviar queijo para todas as lojas");
     }
     if (p.type === "sale")
       actions +=
@@ -236,7 +265,7 @@ function renderPanel() {
         (!p.seller
           ? button(
               "hireSeller",
-              `Contratar vendedor · ${money(rules.sellerHire)} + ${money(rules.sellerSalary)}/dia`,
+              `<img class="resource-icon" src="${assets["icon_vendedor.png"]}" alt="">Contratar vendedor · ${money(rules.sellerHire)} + ${money(rules.sellerSalary)}/dia`,
             )
           : "");
     if (p.type === "security") {
@@ -250,17 +279,7 @@ function renderPanel() {
               "upgradeStars",
               `Promover equipe · ${money(rules.starUpgrade[p.team.stars] ?? 0)}`,
               p.team.stars === 3 ? "disabled" : "",
-            ) +
-            button(
-              "upgradeWeapon",
-              `Armamento +${Math.round(rules.weaponBonus*100)}% ataque · ${money(rules.weaponUpgrade[p.team.weapon] ?? 0)}`,
-              p.team.weapon === 3 ? "disabled" : "",
-            )) +
-        button(
-          "upgradeBarricade",
-          `Barricada +${Math.round(rules.barricadeBonus*100)}% defesa · ${money(rules.barricadeUpgrade[p.barricade] ?? 0)}`,
-          p.barricade === 3 ? "disabled" : "",
-        );
+            )) + combatUpgradeCards(p,assets);
       if (p.team) {
         const empty = owned("security").filter((s) => s.id !== p.id && !s.team);
         if (empty.length)
@@ -309,6 +328,7 @@ function renderPanel() {
   actions+=auctionActions(state,p);
   $("panel").innerHTML =
     `<div id="property-stats">${stats()}</div><div class="actions">${actions}</div>`;
+  updateSupplyQuote('feed');updateSupplyQuote('packaging');
   $("panel").dataset.signature = signature();
   updateEstimate();
   $("attack-target")?.addEventListener("change", updateEstimate);
@@ -321,15 +341,7 @@ function updateEstimate() {
     `Ataque ${amount(info.attack)} · defesa ${amount(info.defense)} · chance ${info.chance.toFixed(1)}% · ${info.duration / 1000}s · ${money(info.cost)}. Pode haver retaliação.`;
 }
 function refresh() {
-  const territory=territoryControl(state,'player');
-  let campaignBar=document.getElementById('campaign-status');
-  if(!campaignBar) {
-    campaignBar=document.createElement('div');campaignBar.id='campaign-status';
-    $('management-bar').after(campaignBar);
-  }
-  campaignBar.textContent=state.campaign?.outcome==='victory' ? 'VITÓRIA — todos os pontos controlados e fazenda/fábrica inimigas adquiridas. Campanha encerrada.'
-    :state.campaign?.outcome==='defeat' ? 'DERROTA — o rival controlou todos os pontos e comprou sua fazenda. Campanha encerrada.'
-    :`${territory.owned}/${territory.total} pontos de venda controlados · ${territory.owned===territory.total ? 'Dispute a fazenda e a queijaria rivais por leilão para vencer.' : 'Controle as lojas e dispute fazendas, queijarias e contratos por leilão.'}`;
+
   if (current?.id === "rural" && $("panel").dataset.signature !== signature())
     renderPanel();
   const c = state.companies.player;
@@ -342,7 +354,7 @@ function refresh() {
         .reduce((n, p) => n + total(p.milk), 0),
     )} L · Queijo ${owned("factory").reduce((n, p) => n + total(p.ready), 0)}</span>`;
   $("speed").value = state.speed;
-  $("speed").title=`Um dia de jogo passa em ${DAY/60000/rules.speedFactors[state.speed]} minutos reais nesta velocidade.`;
+  $("speed").title=`Um dia de jogo passa em ${DAY/1000/rules.speedFactors[state.speed]} segundos reais nesta velocidade.`;
   if ($("property-stats")) {
     const rulesOpen=$('property-stats').querySelector('.combat-rules')?.open;
     $('property-stats').innerHTML=stats();
@@ -373,7 +385,7 @@ function syncClock() {
   state = advance(state, Math.max(0, now - lastReal) * rules.speedFactors[state.speed]);
   lastReal = now;
 }
-async function persist() {
+async function persist(forceCloud=false) {
   if (storageFailed || resettingCampaign) return;
   state.savedAt = Date.now();
   const snapshot = structuredClone(state);
@@ -381,9 +393,12 @@ async function persist() {
   try {
     await saveChain;
     $("save").title = "Jogo salvo";
+    if(!cloud.enabled())$('cloud-state').textContent='Salvo neste navegador';
+    queueCloud(snapshot,forceCloud);
     return true;
   } catch (e) {
     status(`Falha ao salvar: ${e.message}`);
+    $('cloud-state').textContent='Falha ao salvar';$('cloud-state').title=e.message;
   }
 }
 function execute(c) {
@@ -393,7 +408,7 @@ function execute(c) {
     state = command(state, c);
     renderPanel();
     refresh();
-    status("Ação concluída. Estoques e estado atualizados.");
+    status(['buyFeed','buyPackaging'].includes(c.type)?'Compradas '+amount(c.quantity)+' '+(c.type==='buyFeed'?'rações':'embalagens')+' por '+money(c.quantity*(c.type==='buyFeed'?rules.feedPrice:rules.packagingPrice))+'.':'Ação concluída. Estoques e estado atualizados.');
     persist();
   } catch (e) {
     status(e.message);
@@ -405,7 +420,7 @@ function collect(id) {
   if (p.type === "farm")
     execute({ type: "collectMilk", id, target: $("factory-target")?.value });
   if (p.type === "factory")
-    execute({ type: "collectCheese", id, target: $("shop-target")?.value });
+    execute({ type: "collectCheese", id });
   if (p.type === "sale") execute({ type: "collectCash", id });
 }
 function updateRecruitment() {
@@ -415,6 +430,7 @@ function updateRecruitment() {
   $('recruit-details').innerHTML=recruitmentDetails(kind,Number(input.value));
   document.querySelectorAll('.recruit-card[data-level]').forEach(card=>card.setAttribute('aria-pressed',String(card.dataset.level===input.value)));
 }
+$('panel').oninput=e=>{const kind=e.target.id==='feed-quantity'?'feed':e.target.id==='packaging-quantity'?'packaging':null;if(kind){supplyDrafts.set(selected+':'+kind,e.target.value);updateSupplyQuote(kind);}};
 $('panel').onchange=e=>{if(['worker-tier','team-tier'].includes(e.target.id)) updateRecruitment();};
 $("panel").onclick = (e) => {
   const action = e.target.closest("[data-action]")?.dataset.action;
@@ -467,7 +483,6 @@ $("panel").onclick = (e) => {
     return execute({
       type: "collectCheese",
       id: $("service-source").value,
-      target: $("service-target").value,
     });
   if (action === "control") return selectProperty(p.securityId);
   if (action === "sale") return selectProperty(p.saleId);
@@ -475,9 +490,8 @@ $("panel").onclick = (e) => {
   if(action==='bidProperty')c.amount=Math.round(Number($('auction-amount').value)*100);
   if (action === "deployReserve") c.teamId = $("reserve-team").value;
   if (action === "collectMilk") c.target = $("factory-target").value;
-  if (action === "collectCheese") c.target = $("shop-target").value;
   if(action === 'buyFeed') c.quantity=Number($('feed-quantity').value);
-  if(action === 'buyPackaging') c.quantity=10;
+  if(action === 'buyPackaging') c.quantity=Number($('packaging-quantity').value);
   if(action === 'moveCow' || action === 'sellCow') { c.quantity=Number($('cow-quantity').value); c.species=$('manage-cow').value; c.target=$('cow-target').value; }
   if (action === "buyCow") c.species = $("cow-species").value;
   if (action === "produce") {
@@ -510,10 +524,12 @@ const resetDialog=resetCampaignUI({onReset:async()=>{
   try {
     const fresh=createGame();
     fresh.campaignId='rural-'+crypto.randomUUID();
+    fresh.playerProfile={...activeProfile};
     // Substituição atômica: mantém o save anterior caso a gravação falhe.
     saveChain=saveChain.catch(()=>{}).then(()=>save(fresh));
     await saveChain;
     state=fresh;
+    queueCloud(fresh,true);
     storageFailed=false;
     lastReal=lastSave=Date.now();
     current=ruralMap;selected='farm-ze';
@@ -522,11 +538,12 @@ const resetDialog=resetCampaignUI({onReset:async()=>{
   } finally {resettingCampaign=false;lastReal=Date.now();}
 }});
 $('reset-campaign').onclick=()=>resetDialog.open();
-$("save").onclick = async () => { syncClock(); if(await persist()) status("Jogo salvo."); };
+$("save").onclick = async () => { syncClock(); if(await persist(true)) status("Jogo salvo no perfil "+activeProfile.name+"."); };
 try {
-  state = await load();
-  if(state?.resetRevision !== reset.revision) {
-    state=createGame();
+  state = await load(activeProfile.id);
+  if(cloud.enabled()){try{const remote=await cloud.load(activeProfile);if(remote && (!state || remote.savedAt>state.savedAt))state=remote;}catch(e){$("cloud-state").textContent="Nuvem indisponível · progresso local";$("cloud-state").title=e.message;}}
+  if(state && state.resetRevision !== reset.revision) {
+    state=freshCampaign();
     await save(state);
   }
   if (state) {
@@ -535,18 +552,29 @@ try {
     });
     status("Campanha local carregada. Progresso offline calculado em 1×.");
   } else {
-    state = createGame();
+    state = freshCampaign();
     status(
       "Comece levando o queijo inicial da fábrica à barraquinha. Compre ração para produzir leite.",
     );
   }
 } catch (e) {
-  state = createGame();
+  state = freshCampaign();
   storageFailed = true;
   status(
     `Não foi possível carregar o salvamento: ${e.message}. A sessão atual não substituirá o arquivo anterior.`,
   );
 }
+state.playerProfile={...activeProfile};
+$("player-label").textContent=activeProfile.name;
+if(storageFailed)$('cloud-state').textContent='Sessão sem gravação · erro no save';
+else if(!cloud.enabled())$("cloud-state").textContent='Local · Firebase não configurado';
+$("ranking").onclick=()=>ranking.open();
+$("home-logo").onclick=async e=>{
+  e.preventDefault();const destination=e.currentTarget.href;syncClock();
+  if(await persist(true))window.location.assign(destination);
+};
+await persist();
+document.querySelector('#app').inert=false;
 lastReal = Date.now();
 $("reset-campaign").disabled=false;
 renderPanel();

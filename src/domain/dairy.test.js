@@ -19,7 +19,7 @@ for(const [quality,chain] of Object.entries(dairy)) {
   s=advance(s,rules.recipes[quality].time,{offline:true});
   expect(s.properties['factory-ze'].ready).toEqual({[quality+':'+quality]:1});
   s=command(s,{type:'collectCheese',id:'factory-ze',target:'sale-ze'});
-  expect(s.properties['sale-ze'].stock).toEqual({[quality+':'+quality]:1});
+  expect(s.companies.player.shopStock).toEqual({[quality+':'+quality]:1});
  });
 }
 it('espécies especiais podem ser compradas diretamente, com preços altos e sem revelar produto',()=>{

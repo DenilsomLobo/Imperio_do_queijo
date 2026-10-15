@@ -1,3 +1,4 @@
+import {waitForGame} from './qa-entry-helper.mjs';
 import { chromium } from "playwright-core";
 import assert from "node:assert/strict";
 const browser = await chromium.launch({ ...(process.env.QA_BROWSER ? {executablePath:process.env.QA_BROWSER} : {channel:"chrome"}), headless: true });
@@ -9,7 +10,7 @@ try {
     errors = [];
   page.on("pageerror", (e) => errors.push(e.message));
   await page.goto(process.env.QA_URL ?? "http://127.0.0.1:5173/");
-  await page.locator('canvas[data-ready="true"]').waitFor();
+  await waitForGame(page);
   assert.equal(
     await page.getByRole("button", { name: "Mapa-múndi", exact: true }).count(),
     0,

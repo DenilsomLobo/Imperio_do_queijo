@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "check:repo": "node scripts/check-repository.mjs",
     "start": "node scripts/start-game.mjs",
     "dev": "vite --host 127.0.0.1",
     "build": "vite build",

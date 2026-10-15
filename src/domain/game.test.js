@@ -62,11 +62,11 @@ describe("cadeia econômica integrada", () => {
     expect(total(s.properties["factory-ze"].ready)).toBe(0);
     const before = s.companies.player.cash;
     s = advance(s, DAY / rules.sellerDaily);
-    expect(s.properties["sale-ze"].till).toBe(2500);
+    expect(s.properties["sale-ze"].till).toBe(2525);
     expect(s.companies.player.cash).toBe(before);
     s = cmd(s, "collectCash", "sale-ze");
-    expect(s.companies.player.cash).toBe(before + 2500);
-    expect(s.companies.player.revenue).toBe(2500);
+    expect(s.companies.player.cash).toBe(before + 2525);
+    expect(s.companies.player.revenue).toBe(2525);
     expect(s.properties["sale-ze"].till).toBe(0);
     const restored = validateSave(JSON.parse(JSON.stringify(s)));
     expect(restored).toEqual(s);
@@ -124,7 +124,7 @@ describe("cadeia econômica integrada", () => {
     s = advance(s, DAY - 1000);
     expect(s.properties["sale-ze"].sales).toBe(19);
     s = cmd(s, "collectCash", "sale-ze");
-    expect(s.companies.player.revenue).toBe(19 * 2500);
+    expect(s.companies.player.revenue).toBe(19 * 2525);
     expect(() => cmd(s, "collectCash", "sale-ze")).toThrow();
   });
   it("velocidades mantêm um relógio sem duplicar produção", () => {
@@ -172,6 +172,7 @@ describe("combate e conquista", () => {
     s = advance(s, rules.attackDuration, { rng: () => 0 });
     const t = s.companies.coalho.reserveTeams[0];
     expect(t.recoverUntil).toBeGreaterThan(s.time);
+    s.companies.coalho.cash=100000;
     s = command(s, { type: "buyProperty", id: "sale-e1" }, "coalho");
     expect(() =>
       command(
@@ -199,8 +200,8 @@ describe("combate e conquista", () => {
     s = cmd(s, "upgradeWeapon", "sale-n6-control");
     s.properties["sale-e1-control"].barricade = 2;
     const info = estimate(s, "sale-n6-control", "sale-e1-control");
-    expect(info.attack).toBeCloseTo(3 * 1.4 * 1.12);
-    expect(info.defense).toBeCloseTo(3 * 1.3);
+    expect(info.attack).toBeCloseTo(3 * 1.4 * 1.12 * 1.05);
+    expect(info.defense).toBeCloseTo(3 * 1.3 * 1.10);
     const rng = [];
     s = cmd(s, "attack", "sale-n6-control", { target: "sale-e1-control" });
     expect(rng).toHaveLength(0);
@@ -235,7 +236,8 @@ describe("combate e conquista", () => {
     expect(() =>
       cmd(s, "attack", "sale-n6-control", { target: "sale-e1-control" }),
     ).toThrow();
-    s = advance(s, rules.recovery);
+    s.companies.player.cash=10000000;s.companies.coalho.cash=10000000;
+    s = advance(s, rules.recovery, {offline:true});
     expect(
       s.properties["sale-n6-control"].team.recoverUntil,
     ).toBeLessThanOrEqual(s.time);

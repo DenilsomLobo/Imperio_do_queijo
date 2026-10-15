@@ -13,16 +13,16 @@ it('transfere leite e queijo próprios preservando tipos e limites; excedente fi
  s.properties['factory-ze'].ready={'weak:weak':4};s.properties['sale-ze'].stock={'weak:weak':39};s.properties['sale-ze'].sellerActive=false;
  s=advance(s,1000);
  expect(s.properties['factory-ze'].milk.weak).toBe(100);expect(s.properties['farm-ze'].milk).toEqual({weak:1,common:2});
- expect(s.properties['sale-ze'].stock['weak:weak']).toBe(40);expect(s.properties['factory-ze'].ready['weak:weak']).toBe(3);
+ expect(s.companies.player.shopStock['weak:weak']).toBe(40);expect(s.properties['factory-ze'].ready['weak:weak']).toBe(3);
  expect(s.companies.player.logistics.milkMoved).toBe(2);expect(s.companies.player.logistics.cheeseMoved).toBe(1);
  expect(s.properties['factory-coalho'].milk.weak).toBe(1);
 });
 it('sem funcionário não fabrica; com funcionário completa leite → queijo → loja → venda sem cliques',()=>{
  let s=hire(funded());s.properties['farm-ze'].milk={weak:3};
  s=advance(s,1000);expect(s.properties['factory-ze'].milk.weak).toBe(3);expect(s.properties['factory-ze'].batches).toHaveLength(0);
- s=command(s,{type:'hireWorker',id:'factory-ze',level:1});s=advance(s,420000);
+ s=command(s,{type:'hireWorker',id:'factory-ze',level:1});s=advance(s,DAY);
  expect(s.companies.player.logistics.cheeseMoved).toBe(3);expect(s.properties['sale-ze'].sales).toBe(3);
- expect(s.properties['sale-ze'].till).toBe(7500);expect(s.companies.player.revenue).toBe(7500);
+ expect(s.properties['sale-ze'].till).toBe(7575);expect(s.companies.player.revenue).toBe(7575);
 });
 it('cobra R$ 300 após um dia, suspende sem caixa e retoma sem acumular dias parados',()=>{
  let s=hire(funded());const cash=s.companies.player.cash;s=advance(s,DAY-1000,{offline:true});expect(s.companies.player.cash).toBe(cash);

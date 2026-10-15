@@ -33,12 +33,12 @@ it('limite do banco 1 volta a liberar automaticamente no próximo dia',()=>{
 });
 it('taxa de 1% usa vendas menos despesas, fecha uma vez e não taxa prejuízo',()=>{
  let s=hire(funded());s=advance(s,DAY,{offline:true});
- s.properties['sale-ze'].sellerActive=true;s.properties['sale-ze'].stock={'weak:weak':40};
+ s.properties['sale-ze'].seller=s.properties['sale-ze'].sellerActive=true;s.properties['sale-ze'].stock={'weak:weak':40};
  s=advance(s,DAY-1000,{offline:true});
- expect(bankingSnapshot(s).revenue).toBe(47500);
- s=command(s,{type:'buyFeed',id:'farm-ze',quantity:10});expect(bankingSnapshot(s).profit).toBe(42500);
+ expect(bankingSnapshot(s).revenue).toBe(47975);
+ s=command(s,{type:'buyFeed',id:'farm-ze',quantity:10});expect(bankingSnapshot(s).profit).toBe(47225);
  s=advance(s,1000,{offline:true});
- const fees=s.ledger.filter(e=>e.owner==='player'&&e.kind==='Taxa de coleta bancária');expect(fees).toHaveLength(1);expect(fees[0].expense).toBe(950);
+ const fees=s.ledger.filter(e=>e.owner==='player'&&e.kind==='Taxa de coleta bancária');expect(fees).toHaveLength(1);expect(fees[0].expense).toBe(1003);
  s=advance(s,1000);expect(s.ledger.filter(e=>e.owner==='player'&&e.kind==='Taxa de coleta bancária')).toHaveLength(1);
  const unprofitable=advance(hire(funded()),DAY,{offline:true});
  expect(unprofitable.ledger.some(e=>e.owner==='player'&&e.kind==='Taxa de coleta bancária')).toBe(false);
@@ -48,14 +48,14 @@ it('banco 2 cobra 2% e cancelar interrompe coletas sem apagar taxa já gerada',(
  s.companies.player.dailyFinance.revenue=10000;
  const cash=s.companies.player.cash;
  s=command(s,{type:'cancelBank',id:'bank-city'});
- expect(s.companies.player.cash).toBe(cash-150);expect(s.companies.player.bank).toBeNull();
+ expect(s.companies.player.cash).toBe(cash-190);expect(s.companies.player.bank).toBeNull();
  s.properties['sale-ze'].till=2000;s=advance(s,1000);expect(s.properties['sale-ze'].till).toBe(2000);
 });
 it('taxa sem caixa fica pendente e é quitada quando entra dinheiro',()=>{
  let s=hire(funded());s=advance(s,DAY,{offline:true});s.companies.player.dailyFinance.revenue=10000;s.companies.player.cash=0;
- s=command(s,{type:'cancelBank',id:'bank-rural'});expect(s.companies.player.bankDebt).toBe(75);
+ s=command(s,{type:'cancelBank',id:'bank-rural'});expect(s.companies.player.bankDebt).toBe(95);
  s.properties['sale-ze'].till=500;s=command(s,{type:'collectCash',id:'sale-ze'});s=advance(s,1000);
- expect(s.companies.player.bankDebt).toBe(0);expect(s.companies.player.cash).toBe(425);
+ expect(s.companies.player.bankDebt).toBe(0);expect(s.companies.player.cash).toBe(405);
 });
 it('migração reconstrói movimento diário, preserva contrato e é idempotente',()=>{
  const old=funded();delete old.companies.player.dailyFinance;delete old.companies.player.bankDebt;

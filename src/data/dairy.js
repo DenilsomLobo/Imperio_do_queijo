@@ -9,6 +9,7 @@ export const dairy = {
 
 export function discoveredMilk(state,owner='player') {
  const found=new Set(state.companies[owner]?.discoveredMilk ?? []);
+ for(const [key,n] of Object.entries(state.companies[owner]?.shopStock ?? {}))if(n>0)found.add(key.split(':')[1]);
  for(const p of Object.values(state.properties).filter(p=>p.owner===owner)) {
   for(const [k,n] of Object.entries(p.milk ?? {})) if(n>=1) found.add(k);
   for(const stock of [p.ready,p.stock]) for(const [key,n] of Object.entries(stock ?? {})) if(n>0) found.add(key.split(':')[1]);

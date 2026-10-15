@@ -38,13 +38,14 @@ export function finishAuctions(s,book,transfer,report){
 export function validateAuctions(s){
  return Object.entries(s.auctions ?? {}).every(([id,a])=>a.id===id&&auctionEligible(s.properties[id])&&s.properties[id].owner===a.seller&&s.companies[a.bidder]&&Number.isSafeInteger(a.amount)&&a.amount>0&&Number.isFinite(a.startedAt)&&Number.isFinite(a.endsAt)&&a.endsAt>a.startedAt);
 }
-export function auctionDecision(s,owner='coalho'){
+export function auctionDecision(s,owner='coalho',strategy={}){
  const c=s.companies[owner],owned=Object.values(s.properties).filter(p=>p.owner===owner),ownFarms=owned.filter(p=>p.type==='farm'),ownFactories=owned.filter(p=>p.type==='factory');
  const daily=owned.reduce((n,p)=>n+(p.type==='factory'?factoryProfile(p).daily+(p.workers ?? []).reduce((v,w)=>v+rules.workerTiers[w.level].salary,0):p.type==='sale'?rules.shopDailyMaintenance+(p.seller?rules.sellerSalary:0):p.type==='farm'?Object.entries(p.cows).reduce((v,[k,count])=>v+rules.cows[k].feed*count*rules.feedPrice,0):0),0);
- const reserve=Math.max(10000,2*daily);
+ const reserve=Math.max(10000,2*daily,strategy.economy?.reserve ?? 0);
  for(const p of Object.values(s.properties)){
   if(!auctionEligible(p))continue;
   const a=s.auctions?.[p.id];if(a?.bidder===owner||!a&&p.owner===owner)continue;
+  if(strategy.dominance&&!a&&['neutral','public'].includes(p.owner))continue;
   const amount=minimumBid(s,p);if(c.cash<amount+reserve)continue;
   let margin=0,needed=false;
   if(p.type==='farm'){
@@ -58,6 +59,11 @@ export function auctionDecision(s,owner='coalho'){
    needed=p.owner===owner&&Boolean(serviceKind(p)==='bank'?c.bank:c.logistics);
    const revenue=Math.max(0,c.dailyFinance?.revenue ?? 0);
    margin=serviceKind(p)==='bank'?revenue*0.05:Math.max(0,revenue*0.2-rules.logistics.dailyFee);
+  }
+  if(strategy.dominance && strategy.economy?.margin>0){
+   const kind=serviceKind(p),dailyCost=p.type==='factory'?factoryProfile(p).daily:kind==='logistics'?rules.logistics.dailyFee:0;
+   const relevant=kind!=='bank'||!c.bank||c.bank.propertyId===p.id;
+   if(relevant&&strategy.economy.margin>dailyCost){needed=true;margin=Math.max(margin,strategy.economy.margin-dailyCost);}
   }
   const economicValue=propertyValuation(p)+margin*30;
   if(needed&&margin>0&&amount<=economicValue)return {type:'bidProperty',id:p.id,amount};

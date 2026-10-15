@@ -1,0 +1,56 @@
+import {chromium} from 'playwright-core';
+import assert from 'node:assert/strict';
+const browser=await chromium.launch({channel:'chrome',headless:true});
+try{
+ const context=await browser.newContext({viewport:{width:1366,height:1000}});
+ const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.clock.setFixedTime(new Date());
+ await page.goto(process.env.QA_URL ?? 'http://127.0.0.1:5174/');await page.locator('canvas[data-ready="true"]').waitFor();
+ await page.evaluate(async()=>{
+  const {createGame,command}=await import('/src/domain/game.js');const {minimumBid}=await import('/src/domain/auctions.js');const {save}=await import('/src/persistence/local.js');
+  let s=createGame();s.companies.player.cash=100000000;
+  s=command(s,{type:'buyProperty',id:'sale-n6'});
+  s=command(s,{type:'bidProperty',id:'farm-coalho',amount:minimumBid(s,s.properties['farm-coalho'])});
+  s.properties['farm-ze'].feed=123;s.properties['farm-ze'].milk={weak:8};
+  s.properties['factory-ze'].packaging=17;s.properties['factory-ze'].ready={'weak:weak':6};
+  await save(s);
+ });
+ await page.reload();await page.locator('canvas[data-ready="true"]').waitFor();
+ async function property(id){await page.locator('[data-manage="properties"]').click();await page.locator('.building-card[data-property="'+id+'"]').click();}
+ await page.locator('[data-manage="milk"]').click();
+ assert.equal(await page.locator('#management-title').innerText(),'Estoque');
+ let text=await page.locator('#management-content').innerText();
+ for(const value of ['123 un.','17 un.','9 L','6 un.'])assert.ok(text.includes(value),value);
+ assert.equal(await page.locator('.inventory-item').count(),4);
+ assert.equal(await page.locator('.inventory-item img').evaluateAll(nodes=>nodes.every(n=>n.complete&&n.naturalWidth>0)),true);
+ await page.screenshot({path:'docs/qa-shared-inventory.png'});
+ await page.locator('[data-close]').click();
+ await page.locator('[data-manage="properties"]').click();
+ assert.equal(await page.locator('.building-card.is-disputed[data-property="farm-coalho"] .building-dispute img').count(),1);
+ await page.waitForFunction(()=>[...document.querySelectorAll('.building-card img')].every(n=>n.complete&&n.naturalWidth>0));
+ assert.equal(await page.locator('.building-card img').evaluateAll(nodes=>nodes.every(n=>n.complete&&n.naturalWidth>0)),true);
+ assert.ok(!(await page.locator('.building-grid').innerText()).includes('Nível'));
+ await page.screenshot({path:'docs/qa-building-cards.png'});
+ await page.locator('.building-card[data-property="factory-ze"]').click();
+ assert.equal(await page.locator('#property-menu').isVisible(),true);
+ assert.equal(await page.locator('#shop-target').count(),0);
+ assert.equal(await page.locator('[data-action="buyPackaging"] img').evaluate(n=>n.complete&&n.naturalWidth>0),true);
+ await page.locator('[data-action="collectCheese"]').click();
+ assert.ok((await page.locator('#status').innerText()).includes('concluída'));
+ await property('sale-ze');
+ text=await page.locator('#property-stats').innerText();assert.ok(text.includes('6 / 80 queijos compartilhados'));assert.ok(text.includes('+10%'));assert.ok(text.includes('27,50'));
+ await property('sale-n6');assert.ok((await page.locator('#property-stats').innerText()).includes('6 / 80 queijos compartilhados'));
+ await page.screenshot({path:'docs/qa-shared-shop.png'});
+ await property('farm-ze');assert.equal(await page.locator('[data-action="buyFeed"] img').evaluate(n=>n.complete&&n.naturalWidth>0),true);
+ await page.locator('[data-action="buyFeed"]').click();assert.ok((await page.locator('#property-stats').innerText()).includes('133'));
+ await page.locator('#close-property').click();await page.locator('[data-manage="milk"]').click();
+ assert.ok((await page.locator('#management-content').innerText()).includes('133 un.'));
+ await page.locator('[data-close]').click();await page.locator('#save').click();
+ await page.reload();await page.locator('canvas[data-ready="true"]').waitFor();await property('sale-n6');
+ assert.ok((await page.locator('#property-stats').innerText()).includes('6 / 80 queijos compartilhados'));
+ await page.setViewportSize({width:390,height:844});await page.locator('[data-manage="properties"]').click();
+ assert.equal(await page.locator('#management-content').evaluate(e=>e.scrollWidth<=e.clientWidth+1),true);
+ await page.screenshot({path:'docs/qa-building-mobile.png'});
+ assert.deepEqual(errors,[]);
+ console.log('Estoque ilustrado, envio sem destino, duas lojas com estoque único e bônus, compra de ração, cartões/disputa, navegação, reload e mobile passaram em contexto isolado.');
+}finally{await browser.close();}

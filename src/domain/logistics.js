@@ -1,4 +1,5 @@
 import {rules,DAY} from '../data/game-rules.js';
+import {shopCapacity} from './shop-stock.js';
 const sum=stock=>Object.values(stock ?? {}).reduce((n,v)=>n+v,0);
 export function processLogistics(state,act,book) {
  for(const [owner,company] of Object.entries(state.companies)) {
@@ -17,10 +18,10 @@ export function processLogistics(state,act,book) {
    act({type:'collectMilk',id:farm.id,target:factory.id},owner);
    contract.milkMoved+=before-sum(farm.milk);
   }
-  for(const factory of factories) for(const shop of shops) {
-   if(sum(factory.ready)<1 || sum(shop.stock)>=rules.shopCapacity)continue;
+  for(const factory of factories) {
+   if(!shops.length || sum(factory.ready)<1 || sum(company.shopStock)>=shopCapacity(state,owner))continue;
    const before=sum(factory.ready);
-   act({type:'collectCheese',id:factory.id,target:shop.id},owner);
+   act({type:'collectCheese',id:factory.id},owner);
    contract.cheeseMoved+=before-sum(factory.ready);
   }
  }

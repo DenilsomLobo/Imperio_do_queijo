@@ -1,3 +1,4 @@
+import {waitForGame} from './qa-entry-helper.mjs';
 import { chromium } from "playwright-core";
 import assert from "node:assert/strict";
 
@@ -12,7 +13,7 @@ try {
   let time = Date.now();
   await page.clock.setFixedTime(new Date(time));
   await page.goto(process.env.QA_URL ?? "http://127.0.0.1:5174/");
-  await page.locator('canvas[data-ready="true"]').waitFor();
+  await waitForGame(page);
   await page.waitForFunction(
     () =>
       document.querySelector("#status").textContent !== "Carregando campanha…",
@@ -107,7 +108,7 @@ try {
   await page.locator('[data-action="hireAtPost"]').click();
   await page.locator('[data-action="openServiceTarget"]').click();
   await page.locator('[data-action="upgradeStars"]').click();
-  await page.locator('[data-action="upgradeWeapon"]').click();
+  await page.locator('[data-action="upgradeWeapon"]:enabled').click();
   assert.match(await page.locator("#estimate").textContent(), /chance/);
   await page.locator('[data-action="attack"]').click();
   await advance(61000);
@@ -119,7 +120,7 @@ try {
     ),
   );
   await page.reload();
-  await page.locator('canvas[data-ready="true"]').waitFor();
+  await waitForGame(page);
   await page.waitForFunction(() =>
     document.querySelector("#status").textContent.includes("carregada"),
   );

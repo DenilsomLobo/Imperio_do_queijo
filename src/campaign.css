@@ -1,1 +1,17 @@
-#campaign-status {padding:8px 20px;background:#5c4030;color:#fff8e7;border-top:1px solid #d99a24;font:600 14px Georgia,serif;flex:none;}
+.dominance-bars {display:grid;grid-template-columns:1fr 1fr;gap:5px 18px;font:600 12px system-ui,sans-serif;}
+.dominance-bars label {display:block;font-size:12px;margin:0;}
+.dominance-bars progress {display:block;width:100%;height:10px;accent-color:#52734D;margin-top:4px;}
+.dominance-defeat progress {accent-color:#C66B43;}
+.dominance-bars small {display:block;font-size:10px;font-weight:400;}
+.dominance-bars p {grid-column:1/-1;margin:2px 0 0;font-size:10px;color:inherit;font-weight:400;}
+@media(max-width:600px){.dominance-bars{grid-template-columns:1fr;}.dominance-bars small{display:none;}}
+.finance-grid {display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;}
+.finance-grid article {padding:12px;border:1px solid #D8C5A5;border-radius:10px;background:#F3E7CF;}
+.finance-grid span,.finance-grid strong {display:block;overflow-wrap:anywhere;}
+.finance-grid span {font-size:.8rem;color:#786858;margin-bottom:6px;}
+.finance-grid strong {font-size:1.1rem;color:#352719;}
+.finance-table-wrap {overflow:auto;max-width:100%;}
+.finance-table {width:100%;border-collapse:collapse;font-size:.8rem;text-align:left;}
+.finance-table th,.finance-table td {padding:9px;border-bottom:1px solid #D8C5A5;}
+.finance-table td:not(:first-child) {font-variant-numeric:tabular-nums;white-space:nowrap;}
+.supply-quote {font-weight:600;color:#3D5A38;}

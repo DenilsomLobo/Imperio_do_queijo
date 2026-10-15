@@ -19,7 +19,7 @@ it('bandeira é substituída pela equipe mesmo ocupada e loja segue controle',()
 });
 it('missão mostra ataque e defesa, depois neutraliza loja/posto e remove ícones',()=>{
  let s=createGame();
- s.companies.player.cash=1000000;
+ s.companies.player.cash=1000000;s.companies.coalho.cash=1000000;
  s=command(s,{type:'buyProperty',id:'sale-n6'});
  s=command(s,{type:'hireTeam',id:'sale-n6-control'});
  s=command(s,{type:'attack',id:'sale-n6-control',target:'sale-e1-control'});
@@ -31,6 +31,7 @@ it('missão mostra ataque e defesa, depois neutraliza loja/posto e remove ícone
  expect(s.properties['sale-e1'].owner).toBe('neutral');
  expect(s.properties['sale-e1-control'].owner).toBe('neutral');
  expect(s.properties['sale-e1-control'].team).toBeNull();
+ s.companies.coalho.cash=100000;
  const cash=s.companies.coalho.cash;
  s=command(s,{type:'buyProperty',id:'sale-e1'},'coalho');
  expect(s.companies.coalho.cash).toBe(cash-rules.propertyPrice);

@@ -1,10 +1,10 @@
 {
-  "properties": "icones/menu-temporario/properties.svg",
-  "employees": "icones/menu-temporario/employees.svg",
-  "milk": "icones/menu-temporario/milk.svg",
-  "cheese": "icones/menu-temporario/cheese.svg",
-  "cows": "icones/menu-temporario/cows.svg",
-  "revenue": "icones/menu-temporario/revenue.svg",
-  "cash": "icones/menu-temporario/cash.svg",
-  "enemies": "icones/menu-temporario/enemies.svg"
+  "properties": "icones/menu-temporario/properties.png",
+  "employees": "icones/menu-temporario/employees.png",
+  "milk": "icones/menu-temporario/milk.png",
+  "cheese": "icones/menu-temporario/cheese.png",
+  "cows": "icones/menu-temporario/cows.png",
+  "revenue": "icones/menu-temporario/revenue.png",
+  "cash": "icones/menu-temporario/cash.png",
+  "enemies": "icones/menu-temporario/enemies.png"
 }

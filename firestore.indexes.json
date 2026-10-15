@@ -1,0 +1,13 @@
+{
+  "indexes": [{
+    "collectionGroup": "ranking",
+    "queryScope": "COLLECTION",
+    "fields": [
+      {"fieldPath": "rulesVersion", "order": "ASCENDING"},
+      {"fieldPath": "cash", "order": "DESCENDING"}
+    ]
+  }],
+  "fieldOverrides": [
+    {"collectionGroup": "saves", "fieldPath": "snapshot", "indexes": []}
+  ]
+}

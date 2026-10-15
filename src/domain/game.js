@@ -1,4 +1,7 @@
-import {placeBid,finishAuctions,validateAuctions,auctionDecision,serviceKind} from "./auctions.js";
+import {runAi,aiEconomy} from './ai.js';
+import {garrisonBonus,militaryReserve} from './security-network.js';
+import {companyShops,shopCapacity,salePrice,shopIsActive,migrateShopStock} from './shop-stock.js';
+import {placeBid,finishAuctions,validateAuctions,serviceKind} from "./auctions.js";
 import {propertyPurchasePrice,factoryProfile} from "../data/game-rules.js";
 import {processLogistics,validateLogistics} from "./logistics.js";
 import { CLOCK_VERSION, migrateClock } from "./clock-migration.js";
@@ -77,6 +80,7 @@ export function createGame(now = Date.now()) {
     companies: {
       player: {
         name: "Império do Queijo",
+        shopStock:{},
         bank:null,
         logistics:null,
         bankDebt:0,
@@ -87,6 +91,7 @@ export function createGame(now = Date.now()) {
       },
       coalho: {
         name: "Família Coalho",
+        shopStock:{},
         bank:null,
         logistics:null,
         bankDebt:0,
@@ -152,18 +157,18 @@ export function createGame(now = Date.now()) {
 
   return s;
 }
-export function attackStrength(t, time) {
+export function attackStrength(t, time, state, owner=t?.owner) {
   return t && t.moral > 0 && t.busyUntil <= time && t.recoverUntil <= time
     ? t.count *
         rules.stars[t.stars - 1] *
         (1 + t.weapon * rules.weaponBonus) *
-        t.moral
+        t.moral * (1+garrisonBonus(state,owner))
     : 0;
 }
-export function defenseStrength(post, time) {
+export function defenseStrength(post, time, state) {
   const t = post.team;
   return (
-    (attackStrength(t, time) * (1 + post.barricade * rules.barricadeBonus)) /
+    (attackStrength(t, time, state, post.owner) * (1 + post.barricade * rules.barricadeBonus)) /
     (1 + (t?.weapon ?? 0) * rules.weaponBonus)
   );
 }
@@ -190,8 +195,8 @@ export function estimate(s, from, to) {
     a?.type === "security" && d?.type === "security",
     "Selecione postos de segurança.",
   );
-  const attack = attackStrength(a.team, s.time),
-    defense = defenseStrength(d, s.time);
+  const attack = attackStrength(a.team, s.time, s, a.owner),
+    defense = defenseStrength(d, s.time, s);
   return {
     attack,
     defense,
@@ -315,7 +320,7 @@ function act(s, c, owner = "player") {
     case "buyFeed":
       requireThat(p.type === "farm", "Selecione uma fazenda.");
       requireThat(
-        Number.isInteger(c.quantity) && c.quantity > 0 && c.quantity <= 1000,
+        Number.isInteger(c.quantity) && c.quantity > 0 && c.quantity <= rules.supplyPurchaseLimit,
         "Quantidade inválida.",
       );
       spend(s, owner, c.quantity * rules.feedPrice, "Ração", p.id);
@@ -380,7 +385,7 @@ function act(s, c, owner = "player") {
     case "buyPackaging":
       requireThat(p.type === "factory", "Selecione uma fábrica.");
       requireThat(
-        Number.isInteger(c.quantity) && c.quantity > 0 && c.quantity <= 1000,
+        Number.isInteger(c.quantity) && c.quantity > 0 && c.quantity <= rules.supplyPurchaseLimit,
         "Quantidade inválida.",
       );
       spend(s, owner, c.quantity * rules.packagingPrice, "Embalagens", p.id);
@@ -424,11 +429,10 @@ function act(s, c, owner = "player") {
     }
     case "collectCheese": {
       requireThat(p.type === "factory", "Selecione uma fábrica.");
-      const shop = own(s, c.target, owner);
-      requireThat(shop.type === "sale", "Destino deve ser uma loja.");
+      requireThat(companyShops(s,owner).length>0, "Compre uma loja para enviar o queijo.");
       requireThat(
-        transfer(p.ready, shop.stock, rules.shopCapacity) > 0,
-        "Sem queijo pronto ou loja cheia.",
+        transfer(p.ready, s.companies[owner].shopStock, shopCapacity(s,owner)) > 0,
+        "Sem queijo pronto ou estoque compartilhado cheio.",
       );
       break;
     }
@@ -559,7 +563,7 @@ function act(s, c, owner = "player") {
         "Pontos neutros devem ser comprados.",
       );
       requireThat(
-        p.team.cooldownUntil <= s.time && attackStrength(p.team, s.time) > 0,
+        p.team.cooldownUntil <= s.time && attackStrength(p.team, s.time, s, owner) > 0,
         "Equipe ocupada, em recuperação ou cooldown.",
       );
       requireThat(roadConnected(p.id, d.id), "Alvo sem rua direta entre as lojas.");
@@ -590,6 +594,7 @@ function act(s, c, owner = "player") {
 export function command(s, c, owner = "player") {
   requireThat(!s.campaign?.outcome, "Campanha encerrada.");
   const next = structuredClone(s);
+  migrateShopStock(next);
   act(next, c, owner);
   updateCampaign(next);
   return next;
@@ -634,7 +639,7 @@ function resolve(s, m, offline, rng) {
     t.busyUntil = Number.MAX_SAFE_INTEGER;
     return;
   }
-  const probability = chance(m.attack, defenseStrength(to, s.time));
+  const probability = chance(m.attack, defenseStrength(to, s.time, s));
   const won = (rng ? rng() : random(s)) * 100 < probability;
   if (won) {
     const old = to.owner;
@@ -696,19 +701,24 @@ function transferAuctionProperty(s,p,owner){
 }
 function tick(s, dt, offline, rng) {
   if(s.campaign?.outcome) return;
+  migrateShopStock(s);
   const previous = s.time;
   if(Math.floor((previous+dt)/DAY)>Math.floor(previous/DAY)) {
     // As vendas finais pertencem ao dia encerrado, antes da apuração bancária.
     s.time=Math.floor((previous+dt)/DAY)*DAY-1;
-    for(const shop of Object.values(s.properties)) {
-      if(shop.type!=="sale" || !shop.sellerActive || !s.companies[shop.owner]) continue;
-      for(const [key,quantity] of Object.entries(shop.stock)) {
-        if(quantity<=0) continue;
-        const price=rules.recipes[key.split(":")[0]].price;
-        shop.stock[key]=0;shop.sales+=quantity;shop.till+=quantity*price;
-        ledger(s,shop.owner,0,"Venda ao consumidor",shop.id,quantity*price,0);
+    for(const [owner,company] of Object.entries(s.companies)) {
+      const shops=companyShops(s,owner).filter(shopIsActive);
+      if(!shops.length)continue;
+      for(const [key,quantity] of Object.entries(company.shopStock)) {
+        let remaining=quantity;
+        for(let i=0;i<shops.length && remaining>0;i++){
+          const shop=shops[i],sold=Math.ceil(remaining/(shops.length-i));
+          const price=salePrice(s,owner,key.split(':')[0],shop);
+          remaining-=sold;company.shopStock[key]-=sold;shop.sales+=sold;shop.till+=sold*price;
+          ledger(s,owner,0,'Venda ao consumidor',shop.id,sold*price,0);
+        }
       }
-      shop.saleProgress=0;
+      for(const shop of shops)shop.saleProgress=0;
     }
   }
   s.time = previous+dt;
@@ -771,22 +781,23 @@ function tick(s, dt, offline, rng) {
         }
       }
     }
-    if (p.type === "sale" && s.companies[p.owner] && p.sellerActive) {
-      const key = Object.keys(p.stock).find((k) => p.stock[k] > 0);
+    if (p.type === "sale" && s.companies[p.owner] && shopIsActive(p)) {
+      const stock=s.companies[p.owner].shopStock;
+      const key = Object.keys(stock).find((k) => stock[k] > 0);
       if (
         key &&
         p.demandRemaining > 0 &&
-        p.till + rules.recipes[key.split(":")[0]].price <=
+        p.till + salePrice(s,p.owner,key.split(':')[0],p) <=
           rules.shopCashCapacity
       ) {
         p.saleProgress += dt;
         const interval = DAY / rules.sellerDaily;
         if (p.saleProgress >= interval) {
           p.saleProgress -= interval;
-          p.stock[key]--;
+          stock[key]--;
           p.demandRemaining--;
           p.sales++;
-          const price = rules.recipes[key.split(":")[0]].price;
+          const price = salePrice(s,p.owner,key.split(':')[0],p);
           p.till += price;
           ledger(s, p.owner, 0, "Venda ao consumidor", p.id, price, 0);
         }
@@ -858,6 +869,7 @@ function tick(s, dt, offline, rng) {
   settleRetaliation(s);
   finishAuctions(s,(...args)=>ledger(s,...args),(p,owner)=>transferAuctionProperty(s,p,owner),text=>report(s,text));
   updateCampaign(s);
+  if(!offline && !s.campaign?.outcome) staffAiShops(s);
   const due = s.missions.filter((m) => m.due <= s.time);
   s.missions = s.missions.filter((m) => m.due > s.time);
   for (const m of due) resolve(s, m, offline, rng);
@@ -866,92 +878,19 @@ function tick(s, dt, offline, rng) {
     ai(s, offline);
   }
 }
+function staffAiShops(s,owner='coalho'){
+  for(const shop of Object.values(s.properties).filter(p=>p.type==='sale'&&p.owner===owner)){
+    const post=s.properties[shop.securityId];if(!post||post.owner!==owner||post.team)continue;
+    const reserve=s.companies[owner].reserveTeams?.find(t=>t.count>0&&t.recoverUntil<=s.time&&t.busyUntil<=s.time);
+    try{
+      if(reserve)act(s,{type:'deployReserve',id:post.id,teamId:reserve.id},owner);
+      else if(s.companies[owner].cash>=rules.teamHirePrices[0]+Math.max(militaryReserve(s,owner,rules.teamSalaries[0]),aiEconomy(s,owner).reserve+2*rules.teamSalaries[0]))act(s,{type:'hireTeam',id:post.id,level:1},owner);
+    }catch{/* Commands retain their normal ownership, availability and cash checks. */}
+  }
+}
 function ai(s, offline) {
-  const owner = "coalho";
-  const safe = (c) => {
-    try {
-      act(s, c, owner);
-      updateCampaign(s);
-    } catch {
-      /* Mesmas regras e caixa finito; ação recusada não fornece recursos. */
-    }
-  };
-  const farm = Object.values(s.properties).find(
-      (p) => p.type === "farm" && p.owner === owner,
-    ),
-    factory = Object.values(s.properties).find(
-      (p) => p.type === "factory" && p.owner === owner,
-    ),
-    shop = Object.values(s.properties).find(
-      (p) => p.type === "sale" && p.owner === owner,
-    );
-  if (farm && factory) {
-    const dailyFeed=Object.entries(farm.cows).reduce((n,[k,count])=>n+rules.cows[k].feed*count,0);
-    if (farm.feed < dailyFeed) safe({ type: "buyFeed", id: farm.id, quantity: Math.max(1,Math.ceil(dailyFeed)) });
-    if (total(farm.milk) > 0)
-      safe({ type: "collectMilk", id: farm.id, target: factory.id });
-    if (factory.packaging < 1)
-      safe({ type: "buyPackaging", id: factory.id, quantity: 5 });
-    if (
-      factory.milk.weak >= rules.recipes.weak.milk &&
-      !factory.batches.some((b) => b.phase === "production")
-    )
-      safe({
-        type: "produce",
-        id: factory.id,
-        recipe: "weak",
-        quality: "weak",
-      });
-    if (shop) {
-      if (!shop.seller) safe({ type: "hireSeller", id: shop.id });
-      if (total(factory.ready) > 0)
-        safe({ type: "collectCheese", id: factory.id, target: shop.id });
-      if (shop.till > 0) safe({ type: "collectCash", id: shop.id });
-    }
-  }
-  if(offline) return;
-  const homePost=Object.values(s.properties).find(p=>p.type==='security'&&p.owner===owner&&!p.team);
-  if(homePost && s.companies[owner].cash>=rules.teamHirePrices[0]+10000) safe({type:'hireTeam',id:homePost.id,level:1});
-  if(s.time < rules.aiAggressionAfter) return;
-  const bid=auctionDecision(s,owner);
-  if(bid) safe(bid);
-  // Neutral territory is acquired with real money, never by an attack.
-  const purchase = Object.values(s.properties).find(p =>
-    p.type === "sale" && p.owner === "neutral" &&
-    s.companies[owner].cash >= rules.propertyPrice &&
-    Object.values(s.properties).some(home => home.type === "security" && home.owner === owner &&
-      roadConnected(home.id,p.securityId)));
-  if (purchase) safe({type:"buyProperty",id:purchase.id});
-  for (const post of Object.values(s.properties).filter(
-    (p) => p.type === "security" && p.owner === owner,
-  )) {
-    if (!post.team) {
-      const reserve = s.companies[owner].reserveTeams?.find(
-        (t) => t.recoverUntil <= s.time && t.busyUntil <= s.time,
-      );
-      if (reserve)
-        safe({ type: "deployReserve", id: post.id, teamId: reserve.id });
-      else safe({ type: "hireTeam", id: post.id });
-      continue;
-    }
-    if (!attackStrength(post.team, s.time) || post.team.cooldownUntil > s.time)
-      continue;
-    const candidates = Object.values(s.properties)
-      .filter(
-        (p) =>
-          p.type === "security" &&
-          p.owner !== owner &&
-          p.owner !== "neutral" &&
-          roadConnected(post.id, p.id) &&
-          !s.missions.some((m) => m.to === p.id),
-      )
-      .sort((a, b) => distance(post.id, a.id) - distance(post.id, b.id));
-    const target = candidates[0];
-    if (!target) continue;
-    if (estimate(s, post.id, target.id).chance >= 45)
-      safe({ type: "attack", id: post.id, target: target.id });
-    break;
-  }
+  runAi(s,{act,estimate,roadConnected},offline);
+  updateCampaign(s);
 }
 export function advance(s, elapsed, { offline = false, rng } = {}) {
   requireThat(Number.isFinite(elapsed) && elapsed >= 0, "Tempo inválido.");
@@ -1046,9 +985,15 @@ export function migrateSave(saved) {
     ensureBankState(s,owner);
     s.companies[owner].discoveredMilk=discoveredMilk(s,owner);
   }
+  migrateShopStock(s);
   return s;
 }
 export function validateSave(s) {
+  if(s?.playerProfile)requireThat(
+    typeof s.playerProfile.id==='string' && /^[a-z0-9-]{1,100}$/i.test(s.playerProfile.id) &&
+    typeof s.playerProfile.name==='string' && s.playerProfile.name.trim().length>=2 && s.playerProfile.name.length<=30 && !/[\u0000-\u001f<>]/.test(s.playerProfile.name),
+    'Perfil de jogador inválido.',
+  );
   requireThat(
     s?.version === 1 && s.rulesVersion === rules.version,
     "Salvamento incompatível com esta versão de regras.",
@@ -1094,6 +1039,7 @@ export function validateSave(s) {
   }
   requireThat(validateAuctions(s),'Leilão inválido.');
   for (const c of Object.values(s.companies)) {
+    requireThat(Object.entries(c.shopStock ?? {}).every(([key,n])=>rules.recipes[key.split(':')[0]]&&dairy[key.split(':')[1]]&&Number.isSafeInteger(n)&&n>=0),'Estoque compartilhado inválido.');
     requireThat(Number.isFinite(c.cash) && c.cash >= 0, "Caixa inválido.");
     requireThat(validateBankContract(c),"Contrato bancário inválido.");
     requireThat(validateLogistics(c),"Contrato de transportadora inválido.");

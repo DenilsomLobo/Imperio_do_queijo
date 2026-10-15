@@ -9,10 +9,12 @@ node_modules/
 *.pem
 *.key
 dist/
-.env.local
 .npm-cache/
 .browser-preview*/
 .browser-preview*.log
-.browser-preview*/
-.browser-preview*.log
-.npm-cache/
+.firebase/
+*-firebase-adminsdk-*.json
+service-account*.json
+coverage/
+playwright-report/
+test-results/

@@ -1,9 +1,9 @@
 import {DAY} from '../data/game-rules.js';
 const OLD_DAY=60*60*1000;
-export const CLOCK_VERSION=3;
+export const CLOCK_VERSION=4;
 export function migrateClock(state) {
  if((state.clockVersion ?? 1)>=CLOCK_VERSION) return;
- const oldDay=(state.clockVersion ?? 1)===1?OLD_DAY:20*60*1000;
+ const oldDay=(state.clockVersion ?? 1)===1?OLD_DAY:state.clockVersion===2?20*60*1000:5*60*1000;
  const oldTime=state.time,ratio=DAY/oldDay,newTime=oldTime*ratio;
  const stamp=value=>value*ratio;
  const deadline=value=>value===Number.MAX_SAFE_INTEGER?value:value>oldTime?newTime+value-oldTime:stamp(value);

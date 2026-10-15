@@ -1,0 +1,30 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function owner(uid) { return request.auth != null && request.auth.uid == uid; }
+    function metadata() {
+      return request.resource.data.displayName is string
+        && request.resource.data.displayName.size() >= 2
+        && request.resource.data.displayName.size() <= 30
+        && request.resource.data.campaignId is string
+        && request.resource.data.rulesVersion is string
+        && request.resource.data.updatedAt is int;
+    }
+    match /saves/{uid} {
+      allow get: if owner(uid);
+      allow list, delete: if false;
+      allow create, update: if owner(uid) && metadata()
+        && request.resource.data.keys().hasOnly(['displayName','campaignId','rulesVersion','updatedAt','snapshot'])
+        && request.resource.data.snapshot is string
+        && request.resource.data.snapshot.size() <= 850000;
+    }
+    match /ranking/{uid} {
+      allow get: if request.auth != null;
+      allow list: if request.auth != null && request.query.limit <= 10;
+      allow create, update: if owner(uid) && metadata()
+        && request.resource.data.keys().hasOnly(['displayName','campaignId','rulesVersion','updatedAt','cash'])
+        && request.resource.data.cash is int && request.resource.data.cash >= 0;
+      allow delete: if false;
+    }
+  }
+}

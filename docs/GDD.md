@@ -4,6 +4,10 @@ Fonte normativa: [CODEX_MASTER_SPEC.md](CODEX_MASTER_SPEC.md), integralmente pre
 
 Atualização de implementação: a cadeia rural e a disputa de pontos agora estão disponíveis; a campanha completa ainda não. Pedido de correção em CORRECOES_SOLICITADAS.md: propriedades têm geometria/arte fixa em partida, menus específicos, leite/queijo/dinheiro acumulados localmente e ícones condicionais de coleta. Loja e círculo de controle compartilham proprietário; derrota neutraliza pontos controlados, compra de neutros dá controle ao jogador. Valores ausentes autorizados pelo usuário, em BALANCEAMENTO.md. Estas instruções prevalecem sobre o comportamento visual anterior sem reduzir o escopo final.
 
+## Atualização vigente — IA e economia inicial (15/10/2026)
+
+IA estratégica integrada em todas as propriedades, produção por origem, orçamento, rebanho, funcionários, serviços, leilões e fronteiras. Menu Inimigos mostra decisões/projeções. Por autorização do usuário, ração passa a R$ 0,25/unidade e loja, vendedor e capangas nível 1 a R$ 5/dia cada; caixas iniciais R$ 500/R$ 1.000, produção e preços dos queijos preservados. Detalhes vigentes em [BALANCEAMENTO_INICIAL.md](BALANCEAMENTO_INICIAL.md) e [IA_ATUAL.md](IA_ATUAL.md), prevalecendo sobre valores históricos conflitantes abaixo. Não resetar campanhas.
+
 ## Experiência e progressão
 
 Diretriz posterior 14/10/2026: zona rural organizada em ruas isométricas com lojas e capangas em interseções. Serviços em quadras centrais, fazendas externas, inimigos ao norte. Navegação por zonas substitui o mapa-múndi no produto; a interface atual apresenta apenas a rural. Editor exclusivo para desenvolvimento. Paleta oficial em src/theme.css, conforme valores fornecidos pelo usuário. Esta atualização prevalece sobre o requisito antigo de mapa-múndi.

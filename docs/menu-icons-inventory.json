@@ -1,74 +1,82 @@
 [
   {
     "id": "properties",
-    "path": "icones/menu-temporario/properties.svg",
-    "format": "svg",
-    "viewBox": "0 0 96 96",
-    "temporary": true,
-    "bytes": 805,
-    "sha256": "9CC9F22819343FE17CB4C229B13C6527E8452D797A69EFC8DA7C6E8C3192B002"
+    "path": "icones/menu-temporario/properties.png",
+    "format": "png",
+    "width": 1254,
+    "height": 1254,
+    "temporary": false,
+    "bytes": 1782520,
+    "sha256": "223D31FF327D5A3CC037738B40D083ABC6EA4E93B82CB517307D80882A45496D"
   },
   {
     "id": "employees",
-    "path": "icones/menu-temporario/employees.svg",
-    "format": "svg",
-    "viewBox": "0 0 96 96",
-    "temporary": true,
-    "bytes": 882,
-    "sha256": "D63519413B1FA7A1DC167B6CE0EB55F0E266B758F363F5341F0830081FF71D06"
+    "path": "icones/menu-temporario/employees.png",
+    "format": "png",
+    "width": 1254,
+    "height": 1254,
+    "temporary": false,
+    "bytes": 2158907,
+    "sha256": "EE0D4258EEDE19B97F4E73F0FA2697217C9BA1E3C845F35DB13174A0C63FC97A"
   },
   {
     "id": "milk",
-    "path": "icones/menu-temporario/milk.svg",
-    "format": "svg",
-    "viewBox": "0 0 96 96",
-    "temporary": true,
-    "bytes": 743,
-    "sha256": "06C29D67778151D0D8167EA02D5CB00AB09035D6E499C83C4D772D0134C34D97"
+    "path": "icones/menu-temporario/milk.png",
+    "format": "png",
+    "width": 1254,
+    "height": 1254,
+    "temporary": false,
+    "bytes": 1720531,
+    "sha256": "5E54A747BE8E5EC17C645AA7F6B91FF239BA9D7C9A50F5E8B29E90EB7CABD4D9"
   },
   {
     "id": "cheese",
-    "path": "icones/menu-temporario/cheese.svg",
-    "format": "svg",
-    "viewBox": "0 0 96 96",
-    "temporary": true,
-    "bytes": 800,
-    "sha256": "1036AE9CA286DF2C20C99573564EDA3E119E2FDC97DE9D7EA03BF627F0EC3E33"
+    "path": "icones/menu-temporario/cheese.png",
+    "format": "png",
+    "width": 1254,
+    "height": 1254,
+    "temporary": false,
+    "bytes": 2134802,
+    "sha256": "89B33D7ED0D75886B6F76703DBAE09854F28A393AD243B58F2AC1B4952FB80CC"
   },
   {
     "id": "cows",
-    "path": "icones/menu-temporario/cows.svg",
-    "format": "svg",
-    "viewBox": "0 0 96 96",
-    "temporary": true,
-    "bytes": 840,
-    "sha256": "028828FB508C1F6D73A6BB59684A628443B20A1E3982FB1C8A47887BBF276B21"
+    "path": "icones/menu-temporario/cows.png",
+    "format": "png",
+    "width": 1254,
+    "height": 1254,
+    "temporary": false,
+    "bytes": 2214716,
+    "sha256": "2E6841364BE1B1DC04BBD47C878C3C134142D654F8DA54E4C5058D1F9C8FABEC"
   },
   {
     "id": "revenue",
-    "path": "icones/menu-temporario/revenue.svg",
-    "format": "svg",
-    "viewBox": "0 0 96 96",
-    "temporary": true,
-    "bytes": 851,
-    "sha256": "1660CAAE3491CB6954A33FEB152A3620E1A9415F658B6B2775202D79536D05A5"
+    "path": "icones/menu-temporario/revenue.png",
+    "format": "png",
+    "width": 1254,
+    "height": 1254,
+    "temporary": false,
+    "bytes": 1981679,
+    "sha256": "1A999D17E785E39A8D331A114B36086DAD069700359327A1A174F667809584AA"
   },
   {
     "id": "cash",
-    "path": "icones/menu-temporario/cash.svg",
-    "format": "svg",
-    "viewBox": "0 0 96 96",
-    "temporary": true,
-    "bytes": 839,
-    "sha256": "C5A2E293AB9D67F598682DE3CF89A652749B1ED0ED1786ED7A2254BAC50133B8"
+    "path": "icones/menu-temporario/cash.png",
+    "format": "png",
+    "width": 1254,
+    "height": 1254,
+    "temporary": false,
+    "bytes": 1952342,
+    "sha256": "3ABC6F98DBAAD64426A30A6038FB48623A84D7677DE6B91B55486C30094A119D"
   },
   {
     "id": "enemies",
-    "path": "icones/menu-temporario/enemies.svg",
-    "format": "svg",
-    "viewBox": "0 0 96 96",
-    "temporary": true,
-    "bytes": 778,
-    "sha256": "5002633F84FFE8896ED1A8554A7EEF2907EC5034D460A388846C4D001848D921"
+    "path": "icones/menu-temporario/enemies.png",
+    "format": "png",
+    "width": 1254,
+    "height": 1254,
+    "temporary": false,
+    "bytes": 2192738,
+    "sha256": "37030CC1FF2E2A09D441D3F4A29ED682E0947C02C3FBC1531E44372C68827010"
   }
 ]
