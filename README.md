@@ -6,6 +6,8 @@ Império do Queijo é um jogo de gestão, produção e estratégia territorial p
 
 > 🚧 **Em desenvolvimento:** a campanha rural já reúne sistemas jogáveis e integrados. Outras fases e funcionalidades continuam no [roadmap](docs/ROADMAP.md).
 
+## IMPÉRIO DO QUEIJO
+
 ![Império do Queijo](https://portifolio-denilsom-lobo.web.app/images/games/imperio-do-queijo.png)
 
 ## 🎮 Como é jogar
@@ -242,35 +244,17 @@ Valores apresentados refletem a implementação atual e podem evoluir durante o 
 
 ### 1. Fazenda, leite e produção de queijo
 
-> **ESPAÇO PARA GAMEPLAY 1**  
-> Adicione uma imagem, GIF ou link de vídeo mostrando a fazenda, a coleta de leite e a fabricação.
-
-<!-- Substitua o bloco acima quando o arquivo estiver disponível:
-![Gameplay 1 — produção de queijo](docs/media/gameplay-1.gif)
--->
+![Gameplay 1 — produção de queijo](https://portifolio-denilsom-lobo.web.app/images/git_hub_imgs/imp_quei_01.png)
 
 ### 2. Lojas, vendas e gestão financeira
 
-> **ESPAÇO PARA GAMEPLAY 2**  
-> Adicione uma imagem, GIF ou link de vídeo mostrando as lojas, os estoques e o crescimento da empresa.
-
-<!-- Substitua o bloco acima quando o arquivo estiver disponível:
-![Gameplay 2 — vendas e gestão](docs/media/gameplay-2.gif)
--->
+![Gameplay 2 — vendas e gestão](https://portifolio-denilsom-lobo.web.app/images/git_hub_imgs/imp_quei_02.png)
 
 ### 3. Capangas e disputa pelo território
 
-> **ESPAÇO PARA GAMEPLAY 3**  
-> Adicione uma imagem, GIF ou link de vídeo mostrando os capangas, um ataque e o avanço no mapa.
-
-<!-- Substitua o bloco acima quando o arquivo estiver disponível:
-![Gameplay 3 — disputa territorial](docs/media/gameplay-3.gif)
--->
+![Gameplay 3 — disputa territorial](https://portifolio-denilsom-lobo.web.app/images/git_hub_imgs/imp_quei_03.png)
 
 ## 🌐 Jogue no navegador
 
-> **LINK DO SITE PARA JOGAR:** _Adicionar aqui o endereço quando o jogo estiver publicado._
-
-<!-- Quando houver um endereço real, substitua o texto acima por:
-[🧀 Jogar Império do Queijo](COLE_AQUI_O_LINK_DO_SITE)
--->
+ **LINK DO SITE PARA JOGAR:** 
+[🧀 Jogar Império do Queijo](https://portifolio-denilsom-lobo.web.app/games/Imperio_do_queijo/play/)
