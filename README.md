@@ -6,14 +6,7 @@ Império do Queijo é um jogo de gestão, produção e estratégia territorial p
 
 > 🚧 **Em desenvolvimento:** a campanha rural já reúne sistemas jogáveis e integrados. Outras fases e funcionalidades continuam no [roadmap](docs/ROADMAP.md).
 
-## 🖼️ Capa do jogo
-
-> **ESPAÇO PARA A CAPA**  
-> Adicione aqui a imagem principal de apresentação do Império do Queijo.
-
-<!-- Quando a capa estiver pronta, substitua o bloco acima por:
-![Capa de Império do Queijo](docs/media/capa.png)
--->
+![Império do Queijo](https://portifolio-denilsom-lobo.web.app/images/games/imperio-do-queijo.png)
 
 ## 🎮 Como é jogar
 
