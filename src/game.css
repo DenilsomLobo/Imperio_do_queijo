@@ -5,7 +5,7 @@ body {
 #app {
   height: 100vh;
   display: grid;
-  grid-template-rows: 70px 94px auto minmax(0, 1fr) 27px;
+  grid-template-rows: auto auto minmax(0, 1fr) 27px;
 }
 header {
   height: auto;
@@ -386,7 +386,7 @@ dialog p {
 }
 @media (max-width: 850px) {
   #app {
-    grid-template-rows: 78px 88px auto minmax(0, 1fr) 27px;
+    grid-template-rows: auto auto minmax(0, 1fr) 27px;
   }
   header {
     flex-wrap: wrap;

@@ -32,5 +32,5 @@ header .header-action { padding:5px 9px; min-height:44px; white-space:nowrap; }
 #ranking-dialog button { padding:9px 12px; background:#52734D; color:#FFF8E7; border:0; border-radius:8px; }
 @media(max-width:1150px){header {flex-wrap:wrap;} .brand-logo {width:170px;height:62px;} header #hud {margin-left:auto;} }
 @media(max-width:550px){.entry-screen {padding:12px;} .entry-card {padding:20px;} .entry-card h1 {font-size:1.5rem;} header .player-identity {max-width:115px;} .brand-logo {width:155px;height:56px;} .avatar-placeholder {width:28px;} #ranking-list li span {float:none;display:block;margin:4px 0 0;} }
-#app {grid-template-rows:auto auto auto minmax(0,1fr) 27px;}
+#app {grid-template-rows:auto auto minmax(0,1fr) 27px;}
 #app.entry-mode {display:block;overflow:auto;height:100dvh;}
