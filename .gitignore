@@ -9,6 +9,7 @@ node_modules/
 *.pem
 *.key
 dist/
+assets-web/
 .npm-cache/
 .browser-preview*/
 .browser-preview*.log

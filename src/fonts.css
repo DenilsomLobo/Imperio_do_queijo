@@ -1,0 +1,4 @@
+/* Fontes do jogo empacotadas com o build (sem depender de serviços externos).
+   Só o subconjunto latino é baixado, graças ao unicode-range de cada @font-face. */
+@import '@fontsource-variable/nunito/wght.css';
+@import '@fontsource/lilita-one/latin.css';

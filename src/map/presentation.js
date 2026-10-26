@@ -30,3 +30,12 @@ export function combatIcons(state, postId) {
     ...(missions.some(m=>m.to === postId) ? ["icon_defesa.png"] : []),
   ];
 }
+// Aviso curto sobre a construção quando falta um recurso essencial (só para o jogador).
+export function resourceWarning(property) {
+  if (property.owner !== "player") return null;
+  const sum = stock => Object.values(stock ?? {}).reduce((n,v)=>n+v,0);
+  if (property.type === "farm" && sum(property.cows) > 0 && property.feed <= 0) return "Sem ração";
+  if (property.type === "factory" && property.packaging < 1 && sum(property.milk) >= 1 && !(property.workers ?? []).length) return "Sem embalagem";
+  if (property.type === "sale" && !(property.seller && property.sellerActive)) return "Sem vendedor";
+  return null;
+}

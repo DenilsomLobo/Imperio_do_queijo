@@ -28,7 +28,7 @@ export function cowManagementCards(s,assets){
  for(const farm of own(s).filter(p=>p.type==='farm'))for(const [id,n] of Object.entries(farm.cows).filter(([,n])=>n>0)){
   const cow=rules.cows[id];cards.push(card(assets,{kind:'cow',target:farm.id,image:dairy[id].cowAsset,name:`${cow.name} × ${n}`,lines:[`Compra atual: ${cash(cow.price)} por vaca`,`Valor de compra do grupo: ${cash(cow.price*n)}`,`Ração opcional: ${cow.feed*n} un./dia · ${cash(cow.feed*n*rules.feedPrice)}/dia`,`Alocadas: ${title(farm.id)}`]}));
  }
- return '<p>Custo diário calculado para alimentar todas as vacas do cartão. Sem ração, produzem metade; não existe outra diária da vaca.</p>'+(cards.length?'<div class="owned-resource-grid">'+cards.join('')+'</div>':'<p>Nenhuma vaca adquirida.</p>');
+ return '<p class="dialog-lede">Custo diário de ração de cada grupo. Sem ração, as vacas produzem metade.</p>'+(cards.length?'<div class="owned-resource-grid">'+cards.join('')+'</div>':'<p>Nenhuma vaca adquirida.</p>');
 }
 export function shopManagementCards(s,assets,owner='player'){
  const cards=own(s,owner).filter(p=>p.type==='sale').map(shop=>{

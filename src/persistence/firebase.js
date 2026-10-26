@@ -1,6 +1,7 @@
 import {readLocal,writeLocal} from './local.js';
+import {firebaseConfig as portfolioConfig} from '../../../Castle_Roll_V1/firebase-config.js';
 import {migrateSave,validateSave} from '../domain/game.js';
-export const firebaseConfig={apiKey:import.meta.env.VITE_FIREBASE_API_KEY ?? '',projectId:import.meta.env.VITE_FIREBASE_PROJECT_ID ?? ''};
+export const firebaseConfig={apiKey:import.meta.env.VITE_FIREBASE_API_KEY ?? portfolioConfig.apiKey,projectId:import.meta.env.VITE_FIREBASE_PROJECT_ID ?? portfolioConfig.projectId};
 export const cloudEnabled=()=>!!(firebaseConfig.apiKey&&firebaseConfig.projectId);
 export function firebaseClient({config=firebaseConfig,request=fetch,read=readLocal,write=writeLocal,now=Date.now}={}){
  const enabled=()=>!!(config.apiKey&&config.projectId);
@@ -8,7 +9,7 @@ export function firebaseClient({config=firebaseConfig,request=fetch,read=readLoc
  let chain=Promise.resolve();const authJobs=new Map();
  async function json(url,options){
   const r=await request(url,{...options,signal:AbortSignal.timeout(12000)});const body=await r.json();
-  if(!r.ok)throw Error(body.error?.message ?? 'Falha de conexão com Firebase.');return body;
+  if(!r.ok)throw Error((Array.isArray(body)?body[0]?.error:body.error)?.message ?? 'Falha de conexão com Firebase.');return body;
  }
  function auth(profile){
   if(!authJobs.has(profile.id))authJobs.set(profile.id,authorize(profile).finally(()=>authJobs.delete(profile.id)));
@@ -40,22 +41,22 @@ export function firebaseClient({config=firebaseConfig,request=fetch,read=readLoc
   const a=await auth(profile),root=base().replace('https://firestore.googleapis.com/v1/','');
   const common={displayName:profile.name,campaignId:state.campaignId,rulesVersion:state.rulesVersion,updatedAt:state.savedAt};
   await json(base()+':commit',{method:'POST',headers:headers(a),body:JSON.stringify({writes:[
-   {update:{name:root+'/saves/'+a.uid,fields:fields({...common,snapshot})}},
-   {update:{name:root+'/ranking/'+a.uid,fields:fields({...common,cash:state.companies.player.cash})}},
+   {update:{name:root+'/saves_imperio_do_queijo/'+a.uid,fields:fields({...common,snapshot})}},
+   {update:{name:root+'/ranking_imperio_do_queijo/'+a.uid,fields:fields({...common,cash:state.companies.player.cash})}},
   ]})});return {configured:true};
  }
  return {enabled,save(state){const snapshot=structuredClone(state);const job=chain.catch(()=>{}).then(()=>send(snapshot));chain=job;return job;},
   async load(profile){
    if(!enabled())return null;const a=await auth(profile);
-   const r=await request(base()+'/saves/'+a.uid,{headers:headers(a),signal:AbortSignal.timeout(12000)});
+   const r=await request(base()+'/saves_imperio_do_queijo/'+a.uid,{headers:headers(a),signal:AbortSignal.timeout(12000)});
    if(r.status===404)return null;const b=await r.json();if(!r.ok)throw Error(b.error?.message ?? 'Falha ao carregar nuvem.');
    const s=validateSave(migrateSave(JSON.parse(b.fields.snapshot.stringValue)));
    // The authenticated local profile owns this save; names are not credentials.
    s.playerProfile={id:profile.id,name:profile.name};return s;
   },
-  async top(profile,rulesVersion){
-   const a=await auth(profile);
-   const rows=await json(base()+':runQuery',{method:'POST',headers:headers(a),body:JSON.stringify({structuredQuery:{from:[{collectionId:'ranking'}],where:{fieldFilter:{field:{fieldPath:'rulesVersion'},op:'EQUAL',value:{stringValue:rulesVersion}}},orderBy:[{field:{fieldPath:'cash'},direction:'DESCENDING'}],limit:10}})});
+  async top(rulesVersion){
+   if(!enabled())throw Error('Ranking global ainda não configurado.');
+   const rows=await json(base()+':runQuery',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({structuredQuery:{from:[{collectionId:'ranking_imperio_do_queijo'}],where:{fieldFilter:{field:{fieldPath:'rulesVersion'},op:'EQUAL',value:{stringValue:rulesVersion}}},orderBy:[{field:{fieldPath:'cash'},direction:'DESCENDING'}],limit:10}})});
    return rows.filter(r=>r.document).map(r=>{const f=r.document.fields;return {name:f.displayName.stringValue,cash:Number(f.cash.integerValue)};});
   },
  };

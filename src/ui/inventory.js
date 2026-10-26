@@ -15,5 +15,5 @@ export function inventoryRows(state,assets){
   const [recipe,quality]=key.split(':');
   if(n>0&&rules.recipes[recipe]&&dairy[quality])entries.push([rules.recipes[recipe].name,dairy[quality].cheeseAsset,n,'un.']);
  }
- return '<h3>Quantidades em estoque</h3><div class="inventory-grid">'+entries.map(([name,icon,n,unit])=>`<article class="inventory-item"><img src="${assets[icon]}" alt="${name}"><strong>${number(n)} ${unit}</strong><span>${name}</span></article>`).join('')+'</div><p>Tipos de leite e queijo com estoque positivo aparecem acima. Totais reais contados uma única vez; produtos em fabricação ficam na aba Estoque de queijo, com valor e fábrica. Ração fica nas fazendas e embalagens nas queijarias.</p>';
+ return '<h3>Quantidades em estoque</h3><div class="inventory-grid">'+entries.map(([name,icon,n,unit])=>`<article class="inventory-item"><img src="${assets[icon]}" alt="${name}"><strong>${number(n)} ${unit}</strong><span>${name}</span></article>`).join('')+'</div><p class="dialog-lede">Ração fica nas fazendas; embalagens, nas queijarias. Lotes em produção aparecem em Estoque de queijo.</p>';
 }

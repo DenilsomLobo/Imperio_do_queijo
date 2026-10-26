@@ -9,5 +9,5 @@ export function combatUpgradeCards(post,assets){
   const status=purchased?(level===u.current?'Atual':'Adquirido'):!u.available?'Requer equipe':next?'Comprar':'Exige nível '+(level-1);
   const label=`${u.name} nível ${level}, +${Math.round(level*u.bonus*100)}% ${u.effect}, ${money(u.prices[level-1])}. ${status}.`;
   return `<button type="button" class="combat-upgrade-card${purchased?' is-purchased':''}${level===u.current?' is-current':''}${next?' is-next':''}" data-action="${u.action}" data-upgrade-level="${level}" aria-label="${label}" ${next?'':'disabled'}><img src="${assets['icon_'+u.id+'_'+level+'.png']}" alt="${u.name} com ${level} estrela${level===1?'':'s'}"><strong>Nível ${level}</strong><span>+${Math.round(level*u.bonus*100)}% ${u.effect}</span><span>${money(u.prices[level-1])}</span><b>${status}</b></button>`;
- }).join('')+'</div>').join('')+'<p class="upgrade-help">Clique no próximo nível para comprar. Custos por etapa; bônus acumulados. Armamento acompanha a equipe; barricada protege este posto.</p></section>';
+ }).join('')+'</div>').join('')+'<p class="upgrade-help">Toque no próximo nível (borda dourada) para comprar.</p></section>';
 }
