@@ -19,3 +19,7 @@ service-account*.json
 coverage/
 playwright-report/
 test-results/
+
+# Documentação de trabalho mantida só localmente (removida do GitHub).
+docs/
+/ROADMAP.md
